@@ -82,7 +82,8 @@
        console.log(`Servidor rodando na porta ${port}`);
    });
    ```
-### Passo 3: Criação do Servidor Express
+### Passo 3: Criação dos middlewares
+
 1. **Crie um arquivo chamado `cors.js`** e adicione o seguinte código:
 ```javascript
 const cors = (req, res, next) => {
@@ -113,6 +114,8 @@ const contentType = (req, res, next) => {
 
 module.exports = contentType;
 ```
+
+#### Implementando os middlewares no código do servidor
 ```javascript
     const express = require('express');
     const cors = require('./middlewares/cors');
@@ -160,10 +163,13 @@ module.exports = contentType;
     });
 ```
 
+### Passo 4: Criação de função que busca outra opção de porta caso a selecionada não esteja disponível
+
+1. **Instale a biblioteca prompt:**
 ```bash
     npm install prompt
 ```
-
+2. **Altere o arquivo chamado `server.js`** e adicione o seguinte código:
 ```javascript
     const express = require('express');
     const cors = require('./middlewares/cors');
@@ -248,10 +254,9 @@ module.exports = contentType;
     startServer(initialPort);
 ```
 
-```bash
-    mkdir routes
-```
-**Crie um arquivo chamado `userRoutes.js`** e adicione o seguinte código:
+### Passo 5: Criação de rotas para carregamento dinãmico
+
+1. **Crie um arquivo chamado `userRoutes.js` na pasta routes** e adicione o seguinte código:
 ```javascript
     const express = require('express');
     const router = express.Router();
@@ -287,6 +292,7 @@ module.exports = contentType;
 
     module.exports = router;
 ```
+2. **Altere o arquivo chamado `server.js`** e adicione o seguinte código:
 
 ```javascript
     // Bibliotecas
@@ -354,8 +360,9 @@ module.exports = contentType;
     // Iniciar o servidor na porta inicial
     startServer(initialPort);
 ```
+### Passo 6: Criação de arquivo index para centralizar importação de módulos
 
-**Crie um arquivo chamado `index.js`** dentro da pasta middlewares e adicione o seguinte código:
+1. **Crie um arquivo chamado `index.js` na pasta middlewares** e adicione o seguinte código:
 ```javascript
 module.exports = {
     bodyParser: require('./body-parser'),
@@ -363,7 +370,7 @@ module.exports = {
     cors: require('./cors')
 };
 ```
-
+2. **Altere o arquivo chamado `server.js`** e adicione o seguinte código:
 ```javascript
     // Bibliotecas
     const express = require('express');

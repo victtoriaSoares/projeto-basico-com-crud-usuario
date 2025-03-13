@@ -1,17 +1,20 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-// const cors = require('cors');
 const cors = require('./middlewares/cors');
 const fs = require('fs');
 const path = require('path');
 const prompt = require('prompt');
 const logger = require('./middlewares/logger');
+const { swaggerUi, specs } = require('./swaggerConfig'); // Importar configuração do Swagger
 const app = express();
 const initialPort = 3000;
 
 app.use(bodyParser.json());
 app.use(cors);
 app.use(logger);
+
+// Configuração do Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Carregar dinamicamente todas as rotas na pasta 'routes'
 fs.readdirSync(path.join(__dirname, 'routes')).forEach(file => {

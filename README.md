@@ -435,3 +435,249 @@ module.exports = {
     // Iniciar o servidor na porta inicial
     startServer(initialPort);
 ```
+### Passo 7: Criação da documentação do swagger
+
+1. **Instale as dependências necessárias**:
+   ```bash
+   npm install swagger-ui-express swagger-jsdoc
+   ```
+
+2. **crie um arquivo chamado `swaggerConfig.js` na pasta src** e adicione o seguinte código:
+
+```javascript
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
+const options = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'User API',
+            version: '1.0.0',
+            description: 'API para gerenciamento de usuários',
+        },
+    },
+    apis: ['./src/routes/*.js'], // Caminho para os arquivos de rotas
+};
+
+const specs = swaggerJsdoc(options);
+
+module.exports = {
+    swaggerUi,
+    specs,
+};
+```
+3. **Altere o arquivo chamado `serger.js` na pasta src** e adicione o seguinte código:
+
+```javascript
+// Bibliotecas
+const express = require('express');
+const prompt = require('prompt');
+const fs = require('fs');
+const path = require('path');
+const { swaggerUi, specs } = require('./swaggerConfig'); // Importar configuração do Swagger
+
+// Middlewares
+const middlewares = require('./middlewares');
+
+// Cria o servidor express
+const app = express();
+const initialPort = 3000;
+
+// Configura o Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+app.use(middlewares.cors);
+app.use(middlewares.contentType);
+app.use(middlewares.bodyParser);
+
+// Carregar dinamicamente todas as rotas na pasta 'routes'
+fs.readdirSync(path.join(__dirname, 'routes')).forEach(file => {
+    const route = require(`./routes/${file}`);
+    app.use('/api', route);
+});
+
+// Função para iniciar o servidor em uma porta específica
+const startServer = (port) => {
+    app.listen(port, () => {
+        console.log(`Servidor rodando na porta ${port}`);
+        console.log(`Documentação da API disponível em http://localhost:${port}/api-docs`);
+    }).on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            console.log(`Porta ${port} está ocupada.`);
+            const newPort = port + 1;
+            promptUserForNewPort(newPort);
+        } else {
+            console.error(err);
+        }
+    });
+};
+
+// Função para perguntar ao usuário se deseja usar a nova porta
+const promptUserForNewPort = (newPort) => {
+    prompt.start();
+    const schema = {
+        properties: {
+            useNewPort: {
+                description: `Porta ${newPort} está disponível. Deseja usar essa porta? (sim/não)`,
+                pattern: /^(sim|não|s|n)$/i,
+                message: 'Responda com "sim" ou "não"',
+                required: true
+            }
+        }
+    };
+
+    prompt.get(schema, (err, result) => {
+        if (result.useNewPort.toLowerCase() === 'sim' || result.useNewPort.toLowerCase() === 's') {
+            startServer(newPort);
+        } else {
+            console.log('Servidor não iniciado.');
+        }
+    });
+};
+
+// Iniciar o servidor na porta inicial
+startServer(initialPort);
+```
+4. **Altere o arquivo chamado `userRoutes.js` na pasta routes** e adicione o seguinte código:
+
+```javascript
+const express = require('express');
+const router = express.Router();
+
+let users = [];
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - id
+ *         - name
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: The auto-generated id of the user
+ *         name:
+ *           type: string
+ *           description: The name of the user
+ *       example:
+ *         id: d5fE_asz
+ *         name: John Doe
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: The users managing API
+ */
+
+/**
+ * @swagger
+ * /api/users:
+ *   post:
+ *     summary: Create a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: The user was successfully created
+ *       500:
+ *         description: Some server error
+ */
+router.post('/users', (req, res) => {
+    const user = req.body;
+    users.push(user);
+    res.status(201).send('Usuário criado com sucesso!');
+});
+
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Returns the list of all the users
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: The list of the users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ */
+router.get('/users', (req, res) => {
+    res.json(users);
+});
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   put:
+ *     summary: Update the user by the id
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user id
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       200:
+ *         description: The user was updated
+ *       404:
+ *         description: The user was not found
+ *       500:
+ *         description: Some error happened
+ */
+router.put('/users/:id', (req, res) => {
+    const id = req.params.id;
+    const updatedUser = req.body;
+    users = users.map(user => user.id === id ? updatedUser : user);
+    res.send('Usuário atualizado com sucesso!');
+});
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   delete:
+ *     summary: Remove the user by id
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user id
+ *     responses:
+ *       200:
+ *         description: The user was deleted
+ *       404:
+ *         description: The user was not found
+ */
+router.delete('/users/:id', (req, res) => {
+    const id = req.params.id;
+    users = users.filter(user => user.id !== id);
+    res.send('Usuário deletado com sucesso!');
+});
+
+module.exports = router;
+```
+

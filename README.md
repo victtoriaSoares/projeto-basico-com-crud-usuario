@@ -681,3 +681,109 @@ router.delete('/users/:id', (req, res) => {
 module.exports = router;
 ```
 
+```bash
+npm install sqlite3 sequelize
+```
+
+```javascript
+// filepath: /home/professor/Projetos/user-api-v2/src/database.js
+const { Sequelize } = require('sequelize');
+const path = require('path');
+
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  storage: path.join(__dirname, 'database.sqlite')
+});
+
+module.exports = sequelize;
+```
+
+```javascript
+// filepath: /home/professor/Projetos/user-api-v2/src/models/userModel.js
+const { DataTypes } = require('sequelize');
+const sequelize = require('../database');
+
+const User = sequelize.define('User', {
+  id: {
+    type: DataTypes.STRING,
+    primaryKey: true
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  }
+});
+
+module.exports = User;
+```
+
+```javascript
+...
+const sequelize = require('./database'); // Importar a configuração do banco de dados
+const User = require('./models/userModel'); // Importar o modelo de usuário
+...
+
+// Sincronizar o banco de dados e iniciar o servidor
+sequelize.sync().then(() => {
+    console.log('Banco de dados sincronizado');
+    startServer(initialPort);
+}).catch(err => {
+    console.error('Erro ao sincronizar o banco de dados:', err);
+});
+...
+```
+
+```javascript
+// filepath: /home/professor/Projetos/user-api-v2/src/routes/userRoutes.js
+const express = require('express');
+const User = require('../models/userModel');
+const router = express.Router();
+
+router.post('/users', async (req, res) => {
+    try {
+        const user = await User.create(req.body);
+        res.status(201).json(user);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.get('/users', async (req, res) => {
+    try {
+        const users = await User.findAll();
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.put('/users/:id', async (req, res) => {
+    try {
+        const user = await User.findByPk(req.params.id);
+        if (user) {
+            await user.update(req.body);
+            res.json(user);
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.delete('/users/:id', async (req, res) => {
+    try {
+        const user = await User.findByPk(req.params.id);
+        if (user) {
+            await user.destroy();
+            res.json({ message: 'User deleted' });
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+module.exports = router;
+```

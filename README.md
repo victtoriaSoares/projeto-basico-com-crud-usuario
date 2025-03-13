@@ -11,14 +11,16 @@
    user-api/
    ├── node_modules/
    ├── src/
-   │   └── middlewares/
-   │        └── cors.js
-   │        └── content-type.js
-   │        └── body-parser.js
-   │        └── index.js
-   │   └── routes/
-   │        └── userRoutes.js
-   │   └── server.js
+   │ ├── middlewares/
+   │ │ ├── cors.js
+   │ │ ├── content-type.js
+   │ │ ├── body-parser.js
+   │ │ ├── logger.js
+   │ │ └── index.js
+   │ ├── routes/
+   │ │ └── userRoutes.js
+   │ ├── controllers/
+   │ └── server.js
    ├── package.json
    └── package-lock.json
    ```

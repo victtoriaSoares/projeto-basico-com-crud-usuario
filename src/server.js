@@ -1,20 +1,23 @@
+// Bibliotecas
 const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('./middlewares/cors');
+const prompt = require('prompt');
 const fs = require('fs');
 const path = require('path');
-const prompt = require('prompt');
-const logger = require('./middlewares/logger');
 const { swaggerUi, specs } = require('./swaggerConfig'); // Importar configuração do Swagger
+
+// Middlewares
+const middlewares = require('./middlewares');
+
+// Cria o servidor express
 const app = express();
 const initialPort = 3000;
 
-app.use(bodyParser.json());
-app.use(cors);
-app.use(logger);
-
-// Configuração do Swagger
+// Configura o Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+app.use(middlewares.cors);
+app.use(middlewares.contentType);
+app.use(middlewares.bodyParser);
 
 // Carregar dinamicamente todas as rotas na pasta 'routes'
 fs.readdirSync(path.join(__dirname, 'routes')).forEach(file => {
@@ -26,6 +29,7 @@ fs.readdirSync(path.join(__dirname, 'routes')).forEach(file => {
 const startServer = (port) => {
     app.listen(port, () => {
         console.log(`Servidor rodando na porta ${port}`);
+        console.log(`Documentação da API disponível em http://localhost:${port}/api-docs`);
     }).on('error', (err) => {
         if (err.code === 'EADDRINUSE') {
             console.log(`Porta ${port} está ocupada.`);

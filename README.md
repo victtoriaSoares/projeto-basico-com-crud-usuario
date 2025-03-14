@@ -469,7 +469,7 @@ module.exports = {
     specs,
 };
 ```
-3. **Altere o arquivo chamado `serger.js` na pasta src** e adicione o seguinte código:
+3. **Altere o arquivo chamado `server.js` na pasta src** e adicione o seguinte código:
 
 ```javascript
 // Bibliotecas
@@ -683,10 +683,13 @@ router.delete('/users/:id', (req, res) => {
 module.exports = router;
 ```
 
+### Passo 8: Adicionar o sqlLite no projeto
+
+1. Instale as depedências:
 ```bash
 npm install sqlite3 sequelize
 ```
-
+2. **crie um arquivo chamado `database.js` na pasta src** e adicione o seguinte código:
 ```javascript
 // filepath: /home/professor/Projetos/user-api-v2/src/database.js
 const { Sequelize } = require('sequelize');
@@ -699,9 +702,9 @@ const sequelize = new Sequelize({
 
 module.exports = sequelize;
 ```
-
+3. **crie um arquivo chamado `user-model.js` na pasta models** e adicione o seguinte código:
 ```javascript
-// filepath: /home/professor/Projetos/user-api-v2/src/models/userModel.js
+// filepath: /home/professor/Projetos/user-api-v2/src/models/user-model.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../database');
 
@@ -719,10 +722,11 @@ const User = sequelize.define('User', {
 module.exports = User;
 ```
 
+4. **Altere o arquivo chamado `server.js` na pasta src** e adicione o seguinte código:
 ```javascript
 ...
 const sequelize = require('./database'); // Importar a configuração do banco de dados
-const User = require('./models/userModel'); // Importar o modelo de usuário
+const User = require('./models/user-model'); // Importar o modelo de usuário
 ...
 
 // Sincronizar o banco de dados e iniciar o servidor
@@ -734,11 +738,11 @@ sequelize.sync().then(() => {
 });
 ...
 ```
-
+5. **Altere o arquivo chamado `userRoutes.js` na pasta src** e adicione o seguinte código:
 ```javascript
 // filepath: /home/professor/Projetos/user-api-v2/src/routes/userRoutes.js
 const express = require('express');
-const User = require('../models/userModel');
+const User = require('../models/user-model');
 const router = express.Router();
 
 router.post('/users', async (req, res) => {
@@ -788,4 +792,44 @@ router.delete('/users/:id', async (req, res) => {
 });
 
 module.exports = router;
+```
+
+```bash
+npm install dotenv
+```
+
+```
+PORT=3000
+DATABASE_URL=postgres://user:password@localhost:5432/mydatabase
+```
+
+```javascript
+require('dotenv').config();
+
+// Bibliotecas
+const express = require('express');
+const prompt = require('prompt');
+const fs = require('fs');
+const path = require('path');
+const { swaggerUi, specs } = require('./swaggerConfig'); // Importar configuração do Swagger
+const sequelize = require('./database'); // Importar a configuração do banco de dados
+const User = require('./models/user-model'); // Importar o modelo de usuário
+// Middlewares
+const middlewares = require('./middlewares');
+
+// Cria o servidor express
+const app = express();
+
+const initialPort = process.env.PORT || 3000;
+console.log(`Servidor rodando na porta ${initialPort}`);
+
+// Configura o Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+// Redireciona a página root (/) para /api-docs
+app.get('/', (req, res) => {
+    res.redirect('/api-docs');
+});
+
+app.use(middlewares.cors);
 ```

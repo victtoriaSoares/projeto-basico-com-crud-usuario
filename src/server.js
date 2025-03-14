@@ -1,19 +1,29 @@
+require('dotenv').config(); // Carregar variáveis de ambiente
+
 // Bibliotecas
 const express = require('express');
 const prompt = require('prompt');
 const fs = require('fs');
 const path = require('path');
 const { swaggerUi, specs } = require('./swaggerConfig'); // Importar configuração do Swagger
-
+const sequelize = require('./database'); // Importar a configuração do banco de dados
+const User = require('./models/user-model'); // Importar o modelo de usuário
 // Middlewares
 const middlewares = require('./middlewares');
 
 // Cria o servidor express
 const app = express();
-const initialPort = 3000;
+
+const initialPort = process.env.PORT || 3000;
+console.log(`Servidor rodando na porta ${initialPort}`);
 
 // Configura o Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+// Redireciona a página root (/) para /api-docs
+app.get('/', (req, res) => {
+    res.redirect('/api-docs');
+});
 
 app.use(middlewares.cors);
 app.use(middlewares.contentType);
@@ -65,4 +75,10 @@ const promptUserForNewPort = (newPort) => {
 };
 
 // Iniciar o servidor na porta inicial
-startServer(initialPort);
+// Sincronizar o banco de dados e iniciar o servidor
+sequelize.sync().then(() => {
+    console.log('Banco de dados sincronizado');
+    startServer(initialPort);
+}).catch(err => {
+    console.error('Erro ao sincronizar o banco de dados:', err);
+});

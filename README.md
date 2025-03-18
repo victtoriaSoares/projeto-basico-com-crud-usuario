@@ -179,7 +179,7 @@ module.exports = contentType;
     const bodyParser = require('./middlewares/body-parser');
 
     const app = express();
-    const port = 3000;
+    const initialPort = 3000;
 
     app.use(cors)
     app.use(contentType)
@@ -256,7 +256,7 @@ module.exports = contentType;
     startServer(initialPort);
 ```
 
-### Passo 5: Criação de rotas para carregamento dinãmico
+### Passo 5: Criação de rotas para carregamento dinâmico
 
 1. **Crie um arquivo chamado `userRoutes.js` na pasta routes** e adicione o seguinte código:
 ```javascript
@@ -309,7 +309,7 @@ module.exports = contentType;
     const bodyParser = require('./middlewares/body-parser');
 
     const app = express();
-    const port = 3000;
+    const initialPort = 3000;
 
     app.use(cors)
     app.use(contentType)
@@ -384,7 +384,7 @@ module.exports = {
     const middlewares = require('./middlewares');
 
     const app = express();
-    const port = 3000;
+    const initialPort = 3000;
 
     app.use(middlewares.cors)
     app.use(middlewares.contentType)
@@ -794,15 +794,17 @@ router.delete('/users/:id', async (req, res) => {
 module.exports = router;
 ```
 
+### Passo 9: Adicionar o dotenv no projeto
 ```bash
 npm install dotenv
 ```
-
+1. **crie um arquivo chamado `.env` na pasta src** e adicione o seguinte código:
 ```
 PORT=3000
 DATABASE_URL=postgres://user:password@localhost:5432/mydatabase
 ```
 
+2. **Altere o arquivo server.js** e adicione o seguinte código:
 ```javascript
 require('dotenv').config();
 
@@ -832,4 +834,60 @@ app.get('/', (req, res) => {
 });
 
 app.use(middlewares.cors);
+app.use(middlewares.contentType);
+app.use(middlewares.bodyParser);
+
+// Carregar dinamicamente todas as rotas na pasta 'routes'
+fs.readdirSync(path.join(__dirname, 'routes')).forEach(file => {
+    const route = require(`./routes/${file}`);
+    app.use('/api', route);
+});
+
+// Função para iniciar o servidor em uma porta específica
+const startServer = (port) => {
+    app.listen(port, () => {
+        console.log(`Servidor rodando na porta ${port}`);
+        console.log(`Documentação da API disponível em http://localhost:${port}/api-docs`);
+    }).on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            console.log(`Porta ${port} está ocupada.`);
+            const newPort = port + 1;
+            promptUserForNewPort(newPort);
+        } else {
+            console.error(err);
+        }
+    });
+};
+
+// Função para perguntar ao usuário se deseja usar a nova porta
+const promptUserForNewPort = (newPort) => {
+    prompt.start();
+    const schema = {
+        properties: {
+            useNewPort: {
+                description: `Porta ${newPort} está disponível. Deseja usar essa porta? (sim/não)`,
+                pattern: /^(sim|não|s|n)$/i,
+                message: 'Responda com "sim" ou "não"',
+                required: true
+            }
+        }
+    };
+
+    prompt.get(schema, (err, result) => {
+        if (result.useNewPort.toLowerCase() === 'sim' || result.useNewPort.toLowerCase() === 's') {
+            startServer(newPort);
+        } else {
+            console.log('Servidor não iniciado.');
+        }
+    });
+};
+
+// Iniciar o servidor na porta inicial
+// Sincronizar o banco de dados e iniciar o servidor
+sequelize.sync().then(() => {
+    console.log('Banco de dados sincronizado');
+    startServer(initialPort);
+}).catch(err => {
+    console.error('Erro ao sincronizar o banco de dados:', err);
+});
 ```

@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const User = require('../models/user-model');
+const routeAdapter = require('../adapters/express-route-adapter');
+const CriarUsuarioController = require('../controllers/criar-usuario');
 
-let users = [];
 
 /**
  * @swagger
@@ -10,32 +12,38 @@ let users = [];
  *     User:
  *       type: object
  *       required:
- *         - id
- *         - name
+ *         - nome
+ *         - senha
+ *         - email
  *       properties:
- *         id:
+ *         nome:
  *           type: string
- *           description: The auto-generated id of the user
- *         name:
+ *           description: O nome de usuário
+ *         senha:
  *           type: string
- *           description: The name of the user
+ *           description: A senha do usuário
+ *         email:
+ *           type: string
+ *           description: O email do usuário
  *       example:
- *         id: d5fE_asz
- *         name: John Doe
+ *         id: 1
+ *         nome: João da Silva
+ *         senha: 123abc
+ *         email: joao.silva@dominio.com
  */
 
 /**
  * @swagger
  * tags:
  *   name: Users
- *   description: The users managing API
+ *   description: Gerenciamento de usuários API
  */
 
 /**
  * @swagger
  * /api/users:
  *   post:
- *     summary: Create a new user
+ *     summary: Cria um novo usuário
  *     tags: [Users]
  *     requestBody:
  *       required: true
@@ -45,15 +53,11 @@ let users = [];
  *             $ref: '#/components/schemas/User'
  *     responses:
  *       201:
- *         description: The user was successfully created
+ *         description: O usuário foi criado com sucesso!
  *       500:
- *         description: Some server error
+ *         description: Algum erro aconteceu
  */
-router.post('/users', (req, res) => {
-    const user = req.body;
-    users.push(user);
-    res.status(201).send('Usuário criado com sucesso!');
-});
+router.post('/users', routeAdapter(new CriarUsuarioController()));
 
 /**
  * @swagger
@@ -71,8 +75,13 @@ router.post('/users', (req, res) => {
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-router.get('/users', (req, res) => {
-    res.json(users);
+router.get('/users', async (req, res) => {
+    try {
+        const users = await User.findAll();
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 /**
@@ -102,11 +111,18 @@ router.get('/users', (req, res) => {
  *       500:
  *         description: Some error happened
  */
-router.put('/users/:id', (req, res) => {
-    const id = req.params.id;
-    const updatedUser = req.body;
-    users = users.map(user => user.id === id ? updatedUser : user);
-    res.send('Usuário atualizado com sucesso!');
+router.put('/users/:id', async (req, res) => {
+    try {
+        const user = await User.findByPk(req.params.id);
+        if (user) {
+            await user.update(req.body);
+            res.json(user);
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
 });
 
 /**
@@ -128,10 +144,18 @@ router.put('/users/:id', (req, res) => {
  *       404:
  *         description: The user was not found
  */
-router.delete('/users/:id', (req, res) => {
-    const id = req.params.id;
-    users = users.filter(user => user.id !== id);
-    res.send('Usuário deletado com sucesso!');
+router.delete('/users/:id', async (req, res) => {
+    try {
+        const user = await User.findByPk(req.params.id);
+        if (user) {
+            await user.destroy();
+            res.json({ message: 'User deleted' });
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 module.exports = router;

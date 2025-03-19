@@ -1,5 +1,3 @@
-require('dotenv').config(); // Carregar variáveis de ambiente
-
 // Bibliotecas
 const express = require('express');
 const prompt = require('prompt');
@@ -13,17 +11,10 @@ const middlewares = require('./middlewares');
 
 // Cria o servidor express
 const app = express();
-
-const initialPort = process.env.PORT || 3000;
-console.log(`Servidor rodando na porta ${initialPort}`);
+const initialPort = 3000;
 
 // Configura o Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
-
-// Redireciona a página root (/) para /api-docs
-app.get('/', (req, res) => {
-    res.redirect('/api-docs');
-});
 
 app.use(middlewares.cors);
 app.use(middlewares.contentType);

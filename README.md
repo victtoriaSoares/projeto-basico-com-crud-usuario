@@ -1173,7 +1173,7 @@ router.delete('/users/:id', adaptRoute(new DeletarUsuarioController()));
 module.exports = router;
 ```
 
-6. **Altere o arquivo userRoutes.js** e adicione o seguinte código:
+6. **Altere o arquivo express-route-adapter.js** e adicione o seguinte código:
 ```javascript
 const adaptRoute = (controller) => {
   return async function (req, res) {

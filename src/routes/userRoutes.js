@@ -3,6 +3,10 @@ const router = express.Router();
 const User = require('../models/user-model');
 const routeAdapter = require('../adapters/express-route-adapter');
 const CriarUsuarioController = require('../controllers/criar-usuario');
+const ListarUsuarioController = require('../controllers/listar-usuario');
+const EditarUsuarioController = require('../controllers/editar-usuario');
+const DeletarUsuarioController = require('../controllers/deletar-usuario');
+const adaptRoute = require('../adapters/express-route-adapter');
 
 
 /**
@@ -63,11 +67,11 @@ router.post('/users', routeAdapter(new CriarUsuarioController()));
  * @swagger
  * /api/users:
  *   get:
- *     summary: Returns the list of all the users
+ *     summary: Retorna a lista de usuários
  *     tags: [Users]
  *     responses:
  *       200:
- *         description: The list of the users
+ *         description: A lista de usuários foi retornada com sucesso
  *         content:
  *           application/json:
  *             schema:
@@ -75,26 +79,19 @@ router.post('/users', routeAdapter(new CriarUsuarioController()));
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-router.get('/users', async (req, res) => {
-    try {
-        const users = await User.findAll();
-        res.json(users);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+router.get('/users', routeAdapter(new ListarUsuarioController()));
 
 /**
  * @swagger
  * /api/users/{id}:
  *   put:
- *     summary: Update the user by the id
+ *     summary: Atualiza o usuário por id
  *     tags: [Users]
  *     parameters:
  *       - in: path
  *         name: id
  *         schema:
- *           type: string
+ *           type: integer
  *         required: true
  *         description: The user id
  *     requestBody:
@@ -105,57 +102,35 @@ router.get('/users', async (req, res) => {
  *             $ref: '#/components/schemas/User'
  *     responses:
  *       200:
- *         description: The user was updated
+ *         description: O usuário foi atualizado com sucesso
  *       404:
- *         description: The user was not found
+ *         description: O usuário não foi encontrado
  *       500:
- *         description: Some error happened
+ *         description: Algum erro aconteceu
  */
-router.put('/users/:id', async (req, res) => {
-    try {
-        const user = await User.findByPk(req.params.id);
-        if (user) {
-            await user.update(req.body);
-            res.json(user);
-        } else {
-            res.status(404).json({ error: 'User not found' });
-        }
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
+router.put('/users/:id', adaptRoute(new EditarUsuarioController()));
 
 /**
  * @swagger
  * /api/users/{id}:
  *   delete:
- *     summary: Remove the user by id
+ *     summary: Remove o usuário por id
  *     tags: [Users]
  *     parameters:
  *       - in: path
  *         name: id
  *         schema:
- *           type: string
+ *           type: integer
  *         required: true
- *         description: The user id
+ *         description: O id do usuário
  *     responses:
  *       200:
- *         description: The user was deleted
+ *         description: O usuário foi removido com sucesso
  *       404:
- *         description: The user was not found
+ *         description: O usuário não foi encontrado
+ *       500:
+ *         description: Algum erro aconteceu
  */
-router.delete('/users/:id', async (req, res) => {
-    try {
-        const user = await User.findByPk(req.params.id);
-        if (user) {
-            await user.destroy();
-            res.json({ message: 'User deleted' });
-        } else {
-            res.status(404).json({ error: 'User not found' });
-        }
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+router.delete('/users/:id', adaptRoute(new DeletarUsuarioController()));
 
 module.exports = router;

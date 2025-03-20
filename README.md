@@ -891,3 +891,300 @@ sequelize.sync().then(() => {
     console.error('Erro ao sincronizar o banco de dados:', err);
 });
 ```
+
+### Passo 9: Uso de Controller
+
+**adicione a biblioteca do bcrypt**
+```bash
+npm install bcrypt
+```
+
+1. **crie um arquivo chamado `criar-usuario.js` na pasta controllers** e adicione o seguinte código:
+```javascript
+const User = require('../models/user-model');
+const bcrypt = require('bcrypt')
+class CriarUsuarioController {
+
+    /**
+   * @param {HttpRequest} request - Objeto da requisição HTTP
+   * @returns {Promise<HttpResponse>}
+   */
+    async handle(httpRequest) {
+        try {
+            const { nome, email, senha } = httpRequest.body;
+
+            const salt = 10;
+
+            const senhaCriptografada = await bcrypt.hash(senha, salt)
+
+            const usuario = await User.create({
+                nome,
+                email,
+                senha: senhaCriptografada,
+            });
+
+            return {
+                statusCode: 201,
+                body: usuario,
+            };
+        } catch (error) {
+            return {
+                statusCode: 500,
+                body: { error: error.message }, 
+            };
+        }
+    }
+}
+
+module.exports = CriarUsuarioController;
+```
+
+2. **crie um arquivo chamado `editar-usuario.js` na pasta controllers** e adicione o seguinte código:
+```javascript
+const User = require('../models/user-model');
+class EditarUsuarioController {
+    async handle(req, res) {
+        const { id } = req.params;
+        const { nome, email, senha } = req.body;
+        try {
+            const usuario = await User.findByPk(id);
+            if (!usuario) {
+                return {
+                    statusCode: 404,
+                    body: { error: 'Usuário não encontrado' }
+                }
+            }
+            await usuario.update({
+                nome,
+                email,
+                senha,
+            });
+            return {
+                statusCode: 200,
+                body: usuario,
+            };
+        } catch (error) {
+            return {
+                statusCode: 500,
+                body: { error: error.message }
+            }
+        }
+    }
+}
+
+module.exports = EditarUsuarioController;
+```
+
+3. **crie um arquivo chamado `listar-usuario.js` na pasta controllers** e adicione o seguinte código:
+```javascript
+const User = require('../models/user-model');
+
+class ListarUsuarioController {
+  async handle(req, res) {
+    try {
+        const usuarios = await User.findAll();
+        return {
+            statusCode: 200,
+            body: usuarios,
+        };
+    } catch (error) {
+      return {
+        statusCode: 500,
+        body: { error: error.message },
+      };
+        
+    }
+  }
+}
+
+module.exports = ListarUsuarioController;
+```
+
+4. **crie um arquivo chamado `deletar-usuario.js` na pasta controllers** e adicione o seguinte código:
+```javascript
+const User = require('../models/user-model');
+class DeletarUsuarioController {
+    async handle(req, res) {
+        const { id } = req.params;
+        try {
+            const usuario = await User.findByPk(id);
+
+            if (!usuario) {
+                return {
+                    statusCode: 404,
+                    body: { error: 'Usuário não encontrado' },
+                };
+            }
+            await usuario.destroy();
+            return {
+                statusCode: 204,
+                body: {},
+            };
+        }
+        catch (error) {
+            return {
+                statusCode: 500,
+                body: { error: error.message },
+            };
+        }  
+    }
+}
+
+module.exports = DeletarUsuarioController;
+```
+
+5. **Altere o arquivo userRoutes.js** e adicione o seguinte código:
+```javascript
+const express = require('express');
+const router = express.Router();
+const User = require('../models/user-model');
+const routeAdapter = require('../adapters/express-route-adapter');
+const CriarUsuarioController = require('../controllers/criar-usuario');
+const ListarUsuarioController = require('../controllers/listar-usuario');
+const EditarUsuarioController = require('../controllers/editar-usuario');
+const DeletarUsuarioController = require('../controllers/deletar-usuario');
+const adaptRoute = require('../adapters/express-route-adapter');
+
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - nome
+ *         - senha
+ *         - email
+ *       properties:
+ *         nome:
+ *           type: string
+ *           description: O nome de usuário
+ *         senha:
+ *           type: string
+ *           description: A senha do usuário
+ *         email:
+ *           type: string
+ *           description: O email do usuário
+ *       example:
+ *         id: 1
+ *         nome: João da Silva
+ *         senha: 123abc
+ *         email: joao.silva@dominio.com
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: Gerenciamento de usuários API
+ */
+
+/**
+ * @swagger
+ * /api/users:
+ *   post:
+ *     summary: Cria um novo usuário
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: O usuário foi criado com sucesso!
+ *       500:
+ *         description: Algum erro aconteceu
+ */
+router.post('/users', routeAdapter(new CriarUsuarioController()));
+
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Retorna a lista de usuários
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: A lista de usuários foi retornada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ */
+router.get('/users', routeAdapter(new ListarUsuarioController()));
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   put:
+ *     summary: Atualiza o usuário por id
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The user id
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       200:
+ *         description: O usuário foi atualizado com sucesso
+ *       404:
+ *         description: O usuário não foi encontrado
+ *       500:
+ *         description: Algum erro aconteceu
+ */
+router.put('/users/:id', adaptRoute(new EditarUsuarioController()));
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   delete:
+ *     summary: Remove o usuário por id
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: O id do usuário
+ *     responses:
+ *       200:
+ *         description: O usuário foi removido com sucesso
+ *       404:
+ *         description: O usuário não foi encontrado
+ *       500:
+ *         description: Algum erro aconteceu
+ */
+router.delete('/users/:id', adaptRoute(new DeletarUsuarioController()));
+
+module.exports = router;
+```
+
+6. **Altere o arquivo userRoutes.js** e adicione o seguinte código:
+```javascript
+const adaptRoute = (controller) => {
+  return async function (req, res) {
+    const httpRequest = {
+      body: req?.body,
+      params: req?.params
+    };
+    const httpResponse = await controller.handle(httpRequest);
+    res.status(httpResponse.statusCode).json(httpResponse.body);
+  };
+};
+
+module.exports = adaptRoute;
+```

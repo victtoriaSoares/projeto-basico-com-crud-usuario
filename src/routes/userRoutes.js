@@ -1,13 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/user-model');
 const routeAdapter = require('../adapters/express-route-adapter');
 const CriarUsuarioController = require('../controllers/criar-usuario');
 const ListarUsuarioController = require('../controllers/listar-usuario');
 const EditarUsuarioController = require('../controllers/editar-usuario');
 const DeletarUsuarioController = require('../controllers/deletar-usuario');
+const LoginController = require('../controllers/login-controller');
 const adaptRoute = require('../adapters/express-route-adapter');
-
 
 /**
  * @swagger
@@ -31,10 +30,63 @@ const adaptRoute = require('../adapters/express-route-adapter');
  *           description: O email do usuário
  *       example:
  *         id: 1
- *         nome: João da Silva
- *         senha: 123abc
- *         email: joao.silva@dominio.com
+ *         nome: "João da Silva"
+ *         senha: "123abc"
+ *         email: "joao.silva@dominio.com"
  */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: Endpoints de autenticação
+ */
+
+/**
+ * @swagger
+ * /api/login:
+ *   post:
+ *     summary: Realiza o login do usuário
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - senha
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: Email do usuário
+ *               senha:
+ *                 type: string
+ *                 description: Senha do usuário
+ *             example:
+ *               email: "joao.silva@dominio.com"
+ *               senha: "123abc"
+ *     responses:
+ *       200:
+ *         description: Login realizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT gerado
+ *       401:
+ *         description: Credenciais inválidas
+ *       404:
+ *         description: Usuário não encontrado
+ *       500:
+ *         description: Erro interno do servidor
+ */
+router.post('/login', routeAdapter(new LoginController()));
+
 
 /**
  * @swagger

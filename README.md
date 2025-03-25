@@ -1188,3 +1188,303 @@ const adaptRoute = (controller) => {
 
 module.exports = adaptRoute;
 ```
+
+### Passo 10: Criação de Login
+1. **crie um arquivo chamado `loginRoutes.js` na pasta routes** e adicione o seguinte código:
+
+```javascript
+const express = require('express');
+const router = express.Router();
+const routeAdapter = require('../adapters/express-route-adapter');
+const LoginController = require('../controllers/login-controller');
+
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: Endpoints de autenticação
+ */
+
+/**
+ * @swagger
+ * /api/login:
+ *   post:
+ *     summary: Realiza o login do usuário
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - senha
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: Email do usuário
+ *               senha:
+ *                 type: string
+ *                 description: Senha do usuário
+ *             example:
+ *               email: "joao.silva@dominio.com"
+ *               senha: "123abc"
+ *     responses:
+ *       200:
+ *         description: Login realizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT gerado
+ *       401:
+ *         description: Credenciais inválidas
+ *       404:
+ *         description: Usuário não encontrado
+ *       500:
+ *         description: Erro interno do servidor
+ */
+router.post('/login', routeAdapter(new LoginController()));
+
+module.exports = router;
+```
+
+2. **crie um arquivo chamado `login-controller.js` na pasta controllers** e adicione o seguinte código:
+
+```javascript
+const User = require('../models/user-model');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+class LoginController {
+    /**
+     * @param {HttpRequest} httpRequest - Objeto da requisição HTTP
+     * @returns {Promise<HttpResponse>}
+     */
+    async handle(httpRequest) {
+        try {
+            const { email, senha } = httpRequest.body;
+
+            // Verificar se o usuário existe no banco de dados
+            const user = await User.findOne({ where: { email } });
+            if (!user) {
+                return {
+                    statusCode: 404,
+                    body: { message: 'Usuário não encontrado' }
+                };
+            }
+
+            // Comparar a senha recebida com a senha criptografada
+            const senhEhValida = await bcrypt.compare(senha, user.senha);
+            if (!senhEhValida) {
+                return {
+                    statusCode: 401,
+                    body: { message: 'Credenciais inválidas' }
+                };
+            }
+
+            // Gerar o token JWT
+            const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
+                expiresIn: process.env.JWT_EXPIRES_IN // Token válido por 1 hora
+            });
+
+            return {
+                statusCode: 200,
+                body: { token }
+            };
+        } catch (error) {
+            return {
+                statusCode: 500,
+                body: { message: 'Erro interno do servidor', error: error.message }
+            };
+        }
+    }
+}
+
+module.exports = LoginController;
+```
+
+3. **Altere o arquivo userRoutes.js** e adicione o seguinte código:
+```javascript
+const express = require('express');
+const router = express.Router();
+const routeAdapter = require('../adapters/express-route-adapter');
+const CriarUsuarioController = require('../controllers/criar-usuario');
+const ListarUsuarioController = require('../controllers/listar-usuario');
+const EditarUsuarioController = require('../controllers/editar-usuario');
+const DeletarUsuarioController = require('../controllers/deletar-usuario');
+const authMiddleware = require('../middlewares/auth-middleware');
+
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - nome
+ *         - senha
+ *         - email
+ *       properties:
+ *         nome:
+ *           type: string
+ *           description: O nome de usuário
+ *         senha:
+ *           type: string
+ *           description: A senha do usuário
+ *         email:
+ *           type: string
+ *           description: O email do usuário
+ *       example:
+ *         id: 1
+ *         nome: "João da Silva"
+ *         senha: "123abc"
+ *         email: "joao.silva@dominio.com"
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: Gerenciamento de usuários API
+ */
+
+/**
+ * @swagger
+ * /api/users:
+ *   post:
+ *     summary: Cria um novo usuário
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: O usuário foi criado com sucesso!
+ *       500:
+ *         description: Algum erro aconteceu
+ */
+router.post('/users', authMiddleware, routeAdapter(new CriarUsuarioController()));
+
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Retorna a lista de usuários
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: A lista de usuários foi retornada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ */
+router.get('/users', routeAdapter(new ListarUsuarioController()));
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   put:
+ *     summary: Atualiza o usuário por id
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The user id
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       200:
+ *         description: O usuário foi atualizado com sucesso
+ *       404:
+ *         description: O usuário não foi encontrado
+ *       500:
+ *         description: Algum erro aconteceu
+ */
+router.put('/users/:id', routeAdapter(new EditarUsuarioController()));
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   delete:
+ *     summary: Remove o usuário por id
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: O id do usuário
+ *     responses:
+ *       200:
+ *         description: O usuário foi removido com sucesso
+ *       404:
+ *         description: O usuário não foi encontrado
+ *       500:
+ *         description: Algum erro aconteceu
+ */
+router.delete('/users/:id', routeAdapter(new DeletarUsuarioController()));
+
+module.exports = router;
+```
+
+4. **crie um arquivo chamado `auth-middleware.js` na pasta controllers** e adicione o seguinte código:
+
+```javascript
+const jwt = require('jsonwebtoken');
+
+const authMiddleware = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+
+    if (!authHeader) {
+        return res.status(401).json({ message: 'Token não fornecido' });
+    }
+
+    const token = authHeader.split(' ')[1]; // Extrai o token do formato "Bearer <token>"
+
+    if (!token) {
+        return res.status(401).json({ message: 'Token inválido' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Valida o token
+        req.user = decoded; // Adiciona os dados do usuário decodificados ao objeto da requisição
+        next(); // Continua para a próxima função
+    } catch (error) {
+        return res.status(403).json({ message: 'Token inválido ou expirado' });
+    }
+};
+
+module.exports = authMiddleware;
+```

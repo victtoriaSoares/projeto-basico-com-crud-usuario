@@ -5,8 +5,18 @@ const CriarUsuarioController = require('../controllers/criar-usuario');
 const ListarUsuarioController = require('../controllers/listar-usuario');
 const EditarUsuarioController = require('../controllers/editar-usuario');
 const DeletarUsuarioController = require('../controllers/deletar-usuario');
-const LoginController = require('../controllers/login-controller');
-const adaptRoute = require('../adapters/express-route-adapter');
+const authMiddleware = require('../middlewares/auth-middleware');
+
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
 
 /**
  * @swagger
@@ -38,59 +48,6 @@ const adaptRoute = require('../adapters/express-route-adapter');
 /**
  * @swagger
  * tags:
- *   name: Auth
- *   description: Endpoints de autenticação
- */
-
-/**
- * @swagger
- * /api/login:
- *   post:
- *     summary: Realiza o login do usuário
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - senha
- *             properties:
- *               email:
- *                 type: string
- *                 description: Email do usuário
- *               senha:
- *                 type: string
- *                 description: Senha do usuário
- *             example:
- *               email: "joao.silva@dominio.com"
- *               senha: "123abc"
- *     responses:
- *       200:
- *         description: Login realizado com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                   description: Token JWT gerado
- *       401:
- *         description: Credenciais inválidas
- *       404:
- *         description: Usuário não encontrado
- *       500:
- *         description: Erro interno do servidor
- */
-router.post('/login', routeAdapter(new LoginController()));
-
-
-/**
- * @swagger
- * tags:
  *   name: Users
  *   description: Gerenciamento de usuários API
  */
@@ -101,6 +58,8 @@ router.post('/login', routeAdapter(new LoginController()));
  *   post:
  *     summary: Cria um novo usuário
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -113,7 +72,7 @@ router.post('/login', routeAdapter(new LoginController()));
  *       500:
  *         description: Algum erro aconteceu
  */
-router.post('/users', routeAdapter(new CriarUsuarioController()));
+router.post('/users', authMiddleware, routeAdapter(new CriarUsuarioController()));
 
 /**
  * @swagger
@@ -121,6 +80,8 @@ router.post('/users', routeAdapter(new CriarUsuarioController()));
  *   get:
  *     summary: Retorna a lista de usuários
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: A lista de usuários foi retornada com sucesso
@@ -131,7 +92,7 @@ router.post('/users', routeAdapter(new CriarUsuarioController()));
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-router.get('/users', routeAdapter(new ListarUsuarioController()));
+router.get('/users', authMiddleware, routeAdapter(new ListarUsuarioController()));
 
 /**
  * @swagger
@@ -139,6 +100,8 @@ router.get('/users', routeAdapter(new ListarUsuarioController()));
  *   put:
  *     summary: Atualiza o usuário por id
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -160,7 +123,7 @@ router.get('/users', routeAdapter(new ListarUsuarioController()));
  *       500:
  *         description: Algum erro aconteceu
  */
-router.put('/users/:id', adaptRoute(new EditarUsuarioController()));
+router.put('/users/:id', authMiddleware, routeAdapter(new EditarUsuarioController()));
 
 /**
  * @swagger
@@ -168,6 +131,8 @@ router.put('/users/:id', adaptRoute(new EditarUsuarioController()));
  *   delete:
  *     summary: Remove o usuário por id
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -183,6 +148,6 @@ router.put('/users/:id', adaptRoute(new EditarUsuarioController()));
  *       500:
  *         description: Algum erro aconteceu
  */
-router.delete('/users/:id', adaptRoute(new DeletarUsuarioController()));
+router.delete('/users/:id', authMiddleware, routeAdapter(new DeletarUsuarioController()));
 
 module.exports = router;

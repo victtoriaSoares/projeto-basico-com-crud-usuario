@@ -72,16 +72,23 @@ const authMiddleware = require('../middlewares/auth-middleware');
  *       500:
  *         description: Algum erro aconteceu
  */
-router.post('/users', authMiddleware, routeAdapter(new CriarUsuarioController()));
+router.post('/users', routeAdapter(new CriarUsuarioController()));
 
 /**
  * @swagger
- * /api/users:
+ * /api/users/{id}:
  *   get:
  *     summary: Retorna a lista de usuários
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The user id
  *     responses:
  *       200:
  *         description: A lista de usuários foi retornada com sucesso
@@ -92,7 +99,7 @@ router.post('/users', authMiddleware, routeAdapter(new CriarUsuarioController())
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-router.get('/users', authMiddleware, routeAdapter(new ListarUsuarioController()));
+router.get('/users/:id', authMiddleware, routeAdapter(new ListarUsuarioController()));
 
 /**
  * @swagger

@@ -1488,3 +1488,78 @@ const authMiddleware = (req, res, next) => {
 
 module.exports = authMiddleware;
 ```
+
+### Passo 11: Criação de Seed
+
+1. **Rode o comando:**:
+```bash
+npm install --save-dev sequelize-cli
+```
+
+2. **Altere o arquivo package.json** e adicione o seguinte código:
+```javascript
+...
+"scripts": {
+  "sequelize": "sequelize"
+}
+...
+```
+3. **Rode o comando:**:
+```bash
+npx sequelize init --migrations-path=src/migrations --seeders-path=src/seeders --models-path=src/models --config=src/config.json
+```
+4. **Rode o comando:**:
+```bash
+npx sequelize seed:generate --name create-admin-user
+```
+5. **Altere o arquivo YYYYMMDDHHMMSS-create-admin-user.js criado em seeders** e adicione o seguinte código:
+```javascript
+'use strict';
+
+const bcrypt = require('bcrypt');
+
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    const hashedPassword = await bcrypt.hash('admin123', 10); // Substitua pela senha desejada
+
+    return queryInterface.bulkInsert('Users', [
+      {
+        name: 'Admin',
+        email: 'admin@example.com',
+        password: hashedPassword,
+        role: 'admin', // Supondo que você tenha um campo "role" no modelo
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ]);
+  },
+
+  down: async (queryInterface, Sequelize) => {
+    return queryInterface.bulkDelete('Users', { email: 'admin@example.com' }, {});
+  },
+};
+```
+6. **Rode o comando:**:
+```bash
+npx sequelize db:seed:all
+```
+7. **Rode o comando:**:
+```bash
+npx sequelize db:migrate && npx sequelize db:seed:all
+```
+
+1. **crie um arquivo chamado `auth-middleware.js` na pasta controllers** e adicione o seguinte código:
+
+```javascript
+```
+1. **Altere o arquivo userRoutes.js** e adicione o seguinte código:
+```javascript
+```
+
+1. **Instale**:
+```bash
+```
+
+1. **Rode o comando:**:
+```bash
+```

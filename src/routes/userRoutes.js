@@ -87,7 +87,7 @@ router.post('/users', routeAdapter(new CriarUsuarioController()));
  *         name: id
  *         schema:
  *           type: integer
- *         required: true
+ *         required: false
  *         description: The user id
  *     responses:
  *       200:
@@ -99,7 +99,7 @@ router.post('/users', routeAdapter(new CriarUsuarioController()));
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-router.get('/users/:id', authMiddleware, routeAdapter(new ListarUsuarioController()));
+router.get('/users/:id?', authMiddleware, routeAdapter(new ListarUsuarioController()));
 
 /**
  * @swagger

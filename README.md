@@ -1,12 +1,14 @@
 ### Passo 1: Configuração do Projeto
 
 1. **Crie uma pasta para o projeto** e navegue até ela no terminal:
+
    ```bash
    mkdir user-api
    cd user-api
    ```
 
 1. **Crie a seguinte estrutura de pastas e arquivos**:
+
    ```
    user-api/
    ├── node_modules/
@@ -25,19 +27,21 @@
    └── package-lock.json
    ```
 
-2. **Inicialize um novo projeto Node.js**:
+1. **Inicialize um novo projeto Node.js**:
+
    ### Se tiver usando npm
 
    ```bash
    npm init -y
    ```
+
    ### Se tiver usando yarn
-   
+
    ```bash
    yarn init -y
    ```
 
-3. **Instale as dependências necessárias**:
+1. **Instale as dependências necessárias**:
    ```bash
    npm install express
    ```
@@ -45,6 +49,7 @@
 ### Passo 2: Criação do Servidor Express
 
 1. **Crie um arquivo chamado `server.js`** e adicione o seguinte código:
+
    ```javascript
    const express = require('express');
 
@@ -55,50 +60,53 @@
 
    // Endpoint para criação de usuário
    app.post('/users', (req, res) => {
-       const user = req.body;
-       users.push(user);
-       res.status(201).send('Usuário criado com sucesso!');
+     const user = req.body;
+     users.push(user);
+     res.status(201).send('Usuário criado com sucesso!');
    });
 
    // Endpoint para listagem de usuários
    app.get('/users', (req, res) => {
-       res.json(users);
+     res.json(users);
    });
 
    // Endpoint para atualização de usuário
    app.put('/users/:id', (req, res) => {
-       const id = req.params.id;
-       const updatedUser = req.body;
-       users = users.map(user => user.id === id ? updatedUser : user);
-       res.send('Usuário atualizado com sucesso!');
+     const id = req.params.id;
+     const updatedUser = req.body;
+     users = users.map((user) => (user.id === id ? updatedUser : user));
+     res.send('Usuário atualizado com sucesso!');
    });
 
    // Endpoint para deletar usuário
    app.delete('/users/:id', (req, res) => {
-       const id = req.params.id;
-       users = users.filter(user => user.id !== id);
-       res.send('Usuário deletado com sucesso!');
+     const id = req.params.id;
+     users = users.filter((user) => user.id !== id);
+     res.send('Usuário deletado com sucesso!');
    });
 
    app.listen(port, () => {
-       console.log(`Servidor rodando na porta ${port}`);
+     console.log(`Servidor rodando na porta ${port}`);
    });
    ```
+
 ### Passo 3: Criação dos middlewares
 
 1. **Crie um arquivo chamado `cors.js`** e adicione o seguinte código:
+
 ```javascript
 const cors = (req, res, next) => {
-    res.set('access-control-allow-origin', '*');
-    res.set('access-control-allow-headers', '*');
-    res.set('access-control-allow-methods', '*');
-    next();
-}
+  res.set('access-control-allow-origin', '*');
+  res.set('access-control-allow-headers', '*');
+  res.set('access-control-allow-methods', '*');
+  next();
+};
 
 module.exports = cors;
 ```
 
 2. **Crie um arquivo chamado `body-parser.js`** e adicione o seguinte código:
+
 ```javascript
 const { json } = require('express');
 
@@ -108,338 +116,366 @@ module.exports = bodyParser;
 ```
 
 3. **Crie um arquivo chamado `content-type.js`** e adicione o seguinte código:
+
 ```javascript
 const contentType = (req, res, next) => {
-    res.type('json');
-    next();
+  res.type('json');
+  next();
 };
 
 module.exports = contentType;
 ```
 
 #### Implementando os middlewares no código do servidor
+
 ```javascript
-    const express = require('express');
-    const cors = require('./middlewares/cors');
-    const contentType = require('./middlewares/content-type');
-    const bodyParser = require('./middlewares/body-parser');
+const express = require('express');
+const cors = require('./middlewares/cors');
+const contentType = require('./middlewares/content-type');
+const bodyParser = require('./middlewares/body-parser');
 
-    const app = express();
-    const port = 3000;
+const app = express();
+const port = 3000;
 
-    app.use(cors)
-    app.use(contentType)
-    app.use(bodyParser)
+app.use(cors);
+app.use(contentType);
+app.use(bodyParser);
 
-    let users = [];
+let users = [];
 
-    // Endpoint para criação de usuário
-    app.post('/users', (req, res) => {
-        const user = req.body;
-        users.push(user);
-        res.status(201).send('Usuário criado com sucesso!');
-    });
+// Endpoint para criação de usuário
+app.post('/users', (req, res) => {
+  const user = req.body;
+  users.push(user);
+  res.status(201).send('Usuário criado com sucesso!');
+});
 
-    // Endpoint para listagem de usuários
-    app.get('/users', (req, res) => {
-        res.json(users);
-    });
+// Endpoint para listagem de usuários
+app.get('/users', (req, res) => {
+  res.json(users);
+});
 
-    // Endpoint para atualização de usuário
-    app.put('/users/:id', (req, res) => {
-        const id = req.params.id;
-        const updatedUser = req.body;
-        users = users.map(user => user.id === id ? updatedUser : user);
-        res.send('Usuário atualizado com sucesso!');
-    });
+// Endpoint para atualização de usuário
+app.put('/users/:id', (req, res) => {
+  const id = req.params.id;
+  const updatedUser = req.body;
+  users = users.map((user) => (user.id === id ? updatedUser : user));
+  res.send('Usuário atualizado com sucesso!');
+});
 
-    // Endpoint para deletar usuário
-    app.delete('/users/:id', (req, res) => {
-        const id = req.params.id;
-        users = users.filter(user => user.id !== id);
-        res.send('Usuário deletado com sucesso!');
-    });
+// Endpoint para deletar usuário
+app.delete('/users/:id', (req, res) => {
+  const id = req.params.id;
+  users = users.filter((user) => user.id !== id);
+  res.send('Usuário deletado com sucesso!');
+});
 
-    app.listen(port, () => {
-        console.log(`Servidor rodando na porta ${port}`);
-    });
+app.listen(port, () => {
+  console.log(`Servidor rodando na porta ${port}`);
+});
 ```
 
 ### Passo 4: Criação de função que busca outra opção de porta caso a selecionada não esteja disponível
 
 1. **Instale a biblioteca prompt:**
+
 ```bash
     npm install prompt
 ```
+
 2. **Altere o arquivo chamado `server.js`** e adicione o seguinte código:
+
 ```javascript
-    const express = require('express');
-    const cors = require('./middlewares/cors');
-    const contentType = require('./middlewares/content-type');
-    const bodyParser = require('./middlewares/body-parser');
+const express = require('express');
+const cors = require('./middlewares/cors');
+const contentType = require('./middlewares/content-type');
+const bodyParser = require('./middlewares/body-parser');
 
-    const app = express();
-    const initialPort = 3000;
+const app = express();
+const initialPort = 3000;
 
-    app.use(cors)
-    app.use(contentType)
-    app.use(bodyParser)
+app.use(cors);
+app.use(contentType);
+app.use(bodyParser);
 
-    let users = [];
+let users = [];
 
-    // Endpoint para criação de usuário
-    app.post('/users', (req, res) => {
-        const user = req.body;
-        users.push(user);
-        res.status(201).send('Usuário criado com sucesso!');
+// Endpoint para criação de usuário
+app.post('/users', (req, res) => {
+  const user = req.body;
+  users.push(user);
+  res.status(201).send('Usuário criado com sucesso!');
+});
+
+// Endpoint para listagem de usuários
+app.get('/users', (req, res) => {
+  res.json(users);
+});
+
+// Endpoint para atualização de usuário
+app.put('/users/:id', (req, res) => {
+  const id = req.params.id;
+  const updatedUser = req.body;
+  users = users.map((user) => (user.id === id ? updatedUser : user));
+  res.send('Usuário atualizado com sucesso!');
+});
+
+// Endpoint para deletar usuário
+app.delete('/users/:id', (req, res) => {
+  const id = req.params.id;
+  users = users.filter((user) => user.id !== id);
+  res.send('Usuário deletado com sucesso!');
+});
+
+// Função para iniciar o servidor em uma porta específica
+const startServer = (port) => {
+  app
+    .listen(port, () => {
+      console.log(`Servidor rodando na porta ${port}`);
+    })
+    .on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.log(`Porta ${port} está ocupada.`);
+        const newPort = port + 1;
+        promptUserForNewPort(newPort);
+      } else {
+        console.error(err);
+      }
     });
+};
 
-    // Endpoint para listagem de usuários
-    app.get('/users', (req, res) => {
-        res.json(users);
-    });
+// Função para perguntar ao usuário se deseja usar a nova porta
+const promptUserForNewPort = (newPort) => {
+  prompt.start();
+  const schema = {
+    properties: {
+      useNewPort: {
+        description: `Porta ${newPort} está disponível. Deseja usar essa porta? (sim/não)`,
+        pattern: /^(sim|não|s|n)$/i,
+        message: 'Responda com "sim" ou "não"',
+        required: true,
+      },
+    },
+  };
 
-    // Endpoint para atualização de usuário
-    app.put('/users/:id', (req, res) => {
-        const id = req.params.id;
-        const updatedUser = req.body;
-        users = users.map(user => user.id === id ? updatedUser : user);
-        res.send('Usuário atualizado com sucesso!');
-    });
+  prompt.get(schema, (err, result) => {
+    if (
+      result.useNewPort.toLowerCase() === 'sim' ||
+      result.useNewPort.toLowerCase() === 's'
+    ) {
+      startServer(newPort);
+    } else {
+      console.log('Servidor não iniciado.');
+    }
+  });
+};
 
-    // Endpoint para deletar usuário
-    app.delete('/users/:id', (req, res) => {
-        const id = req.params.id;
-        users = users.filter(user => user.id !== id);
-        res.send('Usuário deletado com sucesso!');
-    });
-
-    // Função para iniciar o servidor em uma porta específica
-    const startServer = (port) => {
-        app.listen(port, () => {
-            console.log(`Servidor rodando na porta ${port}`);
-        }).on('error', (err) => {
-            if (err.code === 'EADDRINUSE') {
-                console.log(`Porta ${port} está ocupada.`);
-                const newPort = port + 1;
-                promptUserForNewPort(newPort);
-            } else {
-                console.error(err);
-            }
-        });
-    };
-
-    // Função para perguntar ao usuário se deseja usar a nova porta
-    const promptUserForNewPort = (newPort) => {
-        prompt.start();
-        const schema = {
-            properties: {
-                useNewPort: {
-                    description: `Porta ${newPort} está disponível. Deseja usar essa porta? (sim/não)`,
-                    pattern: /^(sim|não|s|n)$/i,
-                    message: 'Responda com "sim" ou "não"',
-                    required: true
-                }
-            }
-        };
-
-        prompt.get(schema, (err, result) => {
-            if (result.useNewPort.toLowerCase() === 'sim' || result.useNewPort.toLowerCase() === 's') {
-                startServer(newPort);
-            } else {
-                console.log('Servidor não iniciado.');
-            }
-        });
-    };
-
-    // Iniciar o servidor na porta inicial
-    startServer(initialPort);
+// Iniciar o servidor na porta inicial
+startServer(initialPort);
 ```
 
 ### Passo 5: Criação de rotas para carregamento dinâmico
 
 1. **Crie um arquivo chamado `userRoutes.js` na pasta routes** e adicione o seguinte código:
+
 ```javascript
-    const express = require('express');
-    const router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-    let users = [];
+let users = [];
 
-    // Endpoint para criação de usuário
-    router.post('/users', (req, res) => {
-        const user = req.body;
-        users.push(user);
-        res.status(201).send('Usuário criado com sucesso!');
-    });
+// Endpoint para criação de usuário
+router.post('/users', (req, res) => {
+  const user = req.body;
+  users.push(user);
+  res.status(201).send('Usuário criado com sucesso!');
+});
 
-    // Endpoint para listagem de usuários
-    router.get('/users', (req, res) => {
-        res.json(users);
-    });
+// Endpoint para listagem de usuários
+router.get('/users', (req, res) => {
+  res.json(users);
+});
 
-    // Endpoint para atualização de usuário
-    router.put('/users/:id', (req, res) => {
-        const id = req.params.id;
-        const updatedUser = req.body;
-        users = users.map(user => user.id === id ? updatedUser : user);
-        res.send('Usuário atualizado com sucesso!');
-    });
+// Endpoint para atualização de usuário
+router.put('/users/:id', (req, res) => {
+  const id = req.params.id;
+  const updatedUser = req.body;
+  users = users.map((user) => (user.id === id ? updatedUser : user));
+  res.send('Usuário atualizado com sucesso!');
+});
 
-    // Endpoint para deletar usuário
-    router.delete('/users/:id', (req, res) => {
-        const id = req.params.id;
-        users = users.filter(user => user.id !== id);
-        res.send('Usuário deletado com sucesso!');
-    });
+// Endpoint para deletar usuário
+router.delete('/users/:id', (req, res) => {
+  const id = req.params.id;
+  users = users.filter((user) => user.id !== id);
+  res.send('Usuário deletado com sucesso!');
+});
 
-    module.exports = router;
+module.exports = router;
 ```
+
 2. **Altere o arquivo chamado `server.js`** e adicione o seguinte código:
 
 ```javascript
-    // Bibliotecas
-    const express = require('express');
-    const prompt = require('prompt');
-    const fs = require('fs');
-    const path = require('path');
+// Bibliotecas
+const express = require('express');
+const prompt = require('prompt');
+const fs = require('fs');
+const path = require('path');
 
-    // Middlewares
-    const cors = require('./middlewares/cors');
-    const contentType = require('./middlewares/content-type');
-    const bodyParser = require('./middlewares/body-parser');
+// Middlewares
+const cors = require('./middlewares/cors');
+const contentType = require('./middlewares/content-type');
+const bodyParser = require('./middlewares/body-parser');
 
-    const app = express();
-    const initialPort = 3000;
+const app = express();
+const initialPort = 3000;
 
-    app.use(cors)
-    app.use(contentType)
-    app.use(bodyParser)
+app.use(cors);
+app.use(contentType);
+app.use(bodyParser);
 
-    // Carregar dinamicamente todas as rotas na pasta 'routes'
-    fs.readdirSync(path.join(__dirname, 'routes')).forEach(file => {
-        const route = require(`./routes/${file}`);
-        app.use('/api', route);
+// Carregar dinamicamente todas as rotas na pasta 'routes'
+fs.readdirSync(path.join(__dirname, 'routes')).forEach((file) => {
+  const route = require(`./routes/${file}`);
+  app.use('/api', route);
+});
+
+// Função para iniciar o servidor em uma porta específica
+const startServer = (port) => {
+  app
+    .listen(port, () => {
+      console.log(`Servidor rodando na porta ${port}`);
+    })
+    .on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.log(`Porta ${port} está ocupada.`);
+        const newPort = port + 1;
+        promptUserForNewPort(newPort);
+      } else {
+        console.error(err);
+      }
     });
+};
 
-    // Função para iniciar o servidor em uma porta específica
-    const startServer = (port) => {
-        app.listen(port, () => {
-            console.log(`Servidor rodando na porta ${port}`);
-        }).on('error', (err) => {
-            if (err.code === 'EADDRINUSE') {
-                console.log(`Porta ${port} está ocupada.`);
-                const newPort = port + 1;
-                promptUserForNewPort(newPort);
-            } else {
-                console.error(err);
-            }
-        });
-    };
+// Função para perguntar ao usuário se deseja usar a nova porta
+const promptUserForNewPort = (newPort) => {
+  prompt.start();
+  const schema = {
+    properties: {
+      useNewPort: {
+        description: `Porta ${newPort} está disponível. Deseja usar essa porta? (sim/não)`,
+        pattern: /^(sim|não|s|n)$/i,
+        message: 'Responda com "sim" ou "não"',
+        required: true,
+      },
+    },
+  };
 
-    // Função para perguntar ao usuário se deseja usar a nova porta
-    const promptUserForNewPort = (newPort) => {
-        prompt.start();
-        const schema = {
-            properties: {
-                useNewPort: {
-                    description: `Porta ${newPort} está disponível. Deseja usar essa porta? (sim/não)`,
-                    pattern: /^(sim|não|s|n)$/i,
-                    message: 'Responda com "sim" ou "não"',
-                    required: true
-                }
-            }
-        };
+  prompt.get(schema, (err, result) => {
+    if (
+      result.useNewPort.toLowerCase() === 'sim' ||
+      result.useNewPort.toLowerCase() === 's'
+    ) {
+      startServer(newPort);
+    } else {
+      console.log('Servidor não iniciado.');
+    }
+  });
+};
 
-        prompt.get(schema, (err, result) => {
-            if (result.useNewPort.toLowerCase() === 'sim' || result.useNewPort.toLowerCase() === 's') {
-                startServer(newPort);
-            } else {
-                console.log('Servidor não iniciado.');
-            }
-        });
-    };
-
-    // Iniciar o servidor na porta inicial
-    startServer(initialPort);
+// Iniciar o servidor na porta inicial
+startServer(initialPort);
 ```
+
 ### Passo 6: Criação de arquivo index para centralizar importação de módulos
 
 1. **Crie um arquivo chamado `index.js` na pasta middlewares** e adicione o seguinte código:
+
 ```javascript
 module.exports = {
-    bodyParser: require('./body-parser'),
-    contentType: require('./content-type'),
-    cors: require('./cors')
+  bodyParser: require('./body-parser'),
+  contentType: require('./content-type'),
+  cors: require('./cors'),
 };
 ```
+
 2. **Altere o arquivo chamado `server.js`** e adicione o seguinte código:
+
 ```javascript
-    // Bibliotecas
-    const express = require('express');
-    const prompt = require('prompt');
-    const fs = require('fs');
-    const path = require('path');
+// Bibliotecas
+const express = require('express');
+const prompt = require('prompt');
+const fs = require('fs');
+const path = require('path');
 
-    // Middlewares
-    const middlewares = require('./middlewares');
+// Middlewares
+const middlewares = require('./middlewares');
 
-    const app = express();
-    const initialPort = 3000;
+const app = express();
+const initialPort = 3000;
 
-    app.use(middlewares.cors)
-    app.use(middlewares.contentType)
-    app.use(middlewares.bodyParser)
+app.use(middlewares.cors);
+app.use(middlewares.contentType);
+app.use(middlewares.bodyParser);
 
-    // Carregar dinamicamente todas as rotas na pasta 'routes'
-    fs.readdirSync(path.join(__dirname, 'routes')).forEach(file => {
-        const route = require(`./routes/${file}`);
-        app.use('/api', route);
+// Carregar dinamicamente todas as rotas na pasta 'routes'
+fs.readdirSync(path.join(__dirname, 'routes')).forEach((file) => {
+  const route = require(`./routes/${file}`);
+  app.use('/api', route);
+});
+
+// Função para iniciar o servidor em uma porta específica
+const startServer = (port) => {
+  app
+    .listen(port, () => {
+      console.log(`Servidor rodando na porta ${port}`);
+    })
+    .on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.log(`Porta ${port} está ocupada.`);
+        const newPort = port + 1;
+        promptUserForNewPort(newPort);
+      } else {
+        console.error(err);
+      }
     });
+};
 
-    // Função para iniciar o servidor em uma porta específica
-    const startServer = (port) => {
-        app.listen(port, () => {
-            console.log(`Servidor rodando na porta ${port}`);
-        }).on('error', (err) => {
-            if (err.code === 'EADDRINUSE') {
-                console.log(`Porta ${port} está ocupada.`);
-                const newPort = port + 1;
-                promptUserForNewPort(newPort);
-            } else {
-                console.error(err);
-            }
-        });
-    };
+// Função para perguntar ao usuário se deseja usar a nova porta
+const promptUserForNewPort = (newPort) => {
+  prompt.start();
+  const schema = {
+    properties: {
+      useNewPort: {
+        description: `Porta ${newPort} está disponível. Deseja usar essa porta? (sim/não)`,
+        pattern: /^(sim|não|s|n)$/i,
+        message: 'Responda com "sim" ou "não"',
+        required: true,
+      },
+    },
+  };
 
-    // Função para perguntar ao usuário se deseja usar a nova porta
-    const promptUserForNewPort = (newPort) => {
-        prompt.start();
-        const schema = {
-            properties: {
-                useNewPort: {
-                    description: `Porta ${newPort} está disponível. Deseja usar essa porta? (sim/não)`,
-                    pattern: /^(sim|não|s|n)$/i,
-                    message: 'Responda com "sim" ou "não"',
-                    required: true
-                }
-            }
-        };
+  prompt.get(schema, (err, result) => {
+    if (
+      result.useNewPort.toLowerCase() === 'sim' ||
+      result.useNewPort.toLowerCase() === 's'
+    ) {
+      startServer(newPort);
+    } else {
+      console.log('Servidor não iniciado.');
+    }
+  });
+};
 
-        prompt.get(schema, (err, result) => {
-            if (result.useNewPort.toLowerCase() === 'sim' || result.useNewPort.toLowerCase() === 's') {
-                startServer(newPort);
-            } else {
-                console.log('Servidor não iniciado.');
-            }
-        });
-    };
-
-    // Iniciar o servidor na porta inicial
-    startServer(initialPort);
+// Iniciar o servidor na porta inicial
+startServer(initialPort);
 ```
+
 ### Passo 7: Criação da documentação do swagger
 
 1. **Instale as dependências necessárias**:
+
    ```bash
    npm install swagger-ui-express swagger-jsdoc
    ```
@@ -451,24 +487,25 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
 const options = {
-    definition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'User API',
-            version: '1.0.0',
-            description: 'API para gerenciamento de usuários',
-        },
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'User API',
+      version: '1.0.0',
+      description: 'API para gerenciamento de usuários',
     },
-    apis: ['./src/routes/*.js'], // Caminho para os arquivos de rotas
+  },
+  apis: ['./src/routes/*.js'], // Caminho para os arquivos de rotas
 };
 
 const specs = swaggerJsdoc(options);
 
 module.exports = {
-    swaggerUi,
-    specs,
+  swaggerUi,
+  specs,
 };
 ```
+
 3. **Altere o arquivo chamado `server.js` na pasta src** e adicione o seguinte código:
 
 ```javascript
@@ -494,53 +531,61 @@ app.use(middlewares.contentType);
 app.use(middlewares.bodyParser);
 
 // Carregar dinamicamente todas as rotas na pasta 'routes'
-fs.readdirSync(path.join(__dirname, 'routes')).forEach(file => {
-    const route = require(`./routes/${file}`);
-    app.use('/api', route);
+fs.readdirSync(path.join(__dirname, 'routes')).forEach((file) => {
+  const route = require(`./routes/${file}`);
+  app.use('/api', route);
 });
 
 // Função para iniciar o servidor em uma porta específica
 const startServer = (port) => {
-    app.listen(port, () => {
-        console.log(`Servidor rodando na porta ${port}`);
-        console.log(`Documentação da API disponível em http://localhost:${port}/api-docs`);
-    }).on('error', (err) => {
-        if (err.code === 'EADDRINUSE') {
-            console.log(`Porta ${port} está ocupada.`);
-            const newPort = port + 1;
-            promptUserForNewPort(newPort);
-        } else {
-            console.error(err);
-        }
+  app
+    .listen(port, () => {
+      console.log(`Servidor rodando na porta ${port}`);
+      console.log(
+        `Documentação da API disponível em http://localhost:${port}/api-docs`
+      );
+    })
+    .on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.log(`Porta ${port} está ocupada.`);
+        const newPort = port + 1;
+        promptUserForNewPort(newPort);
+      } else {
+        console.error(err);
+      }
     });
 };
 
 // Função para perguntar ao usuário se deseja usar a nova porta
 const promptUserForNewPort = (newPort) => {
-    prompt.start();
-    const schema = {
-        properties: {
-            useNewPort: {
-                description: `Porta ${newPort} está disponível. Deseja usar essa porta? (sim/não)`,
-                pattern: /^(sim|não|s|n)$/i,
-                message: 'Responda com "sim" ou "não"',
-                required: true
-            }
-        }
-    };
+  prompt.start();
+  const schema = {
+    properties: {
+      useNewPort: {
+        description: `Porta ${newPort} está disponível. Deseja usar essa porta? (sim/não)`,
+        pattern: /^(sim|não|s|n)$/i,
+        message: 'Responda com "sim" ou "não"',
+        required: true,
+      },
+    },
+  };
 
-    prompt.get(schema, (err, result) => {
-        if (result.useNewPort.toLowerCase() === 'sim' || result.useNewPort.toLowerCase() === 's') {
-            startServer(newPort);
-        } else {
-            console.log('Servidor não iniciado.');
-        }
-    });
+  prompt.get(schema, (err, result) => {
+    if (
+      result.useNewPort.toLowerCase() === 'sim' ||
+      result.useNewPort.toLowerCase() === 's'
+    ) {
+      startServer(newPort);
+    } else {
+      console.log('Servidor não iniciado.');
+    }
+  });
 };
 
 // Iniciar o servidor na porta inicial
 startServer(initialPort);
 ```
+
 4. **Altere o arquivo chamado `userRoutes.js` na pasta routes** e adicione o seguinte código:
 
 ```javascript
@@ -596,9 +641,9 @@ let users = [];
  *         description: Some server error
  */
 router.post('/users', (req, res) => {
-    const user = req.body;
-    users.push(user);
-    res.status(201).send('Usuário criado com sucesso!');
+  const user = req.body;
+  users.push(user);
+  res.status(201).send('Usuário criado com sucesso!');
 });
 
 /**
@@ -618,7 +663,7 @@ router.post('/users', (req, res) => {
  *                 $ref: '#/components/schemas/User'
  */
 router.get('/users', (req, res) => {
-    res.json(users);
+  res.json(users);
 });
 
 /**
@@ -649,10 +694,10 @@ router.get('/users', (req, res) => {
  *         description: Some error happened
  */
 router.put('/users/:id', (req, res) => {
-    const id = req.params.id;
-    const updatedUser = req.body;
-    users = users.map(user => user.id === id ? updatedUser : user);
-    res.send('Usuário atualizado com sucesso!');
+  const id = req.params.id;
+  const updatedUser = req.body;
+  users = users.map((user) => (user.id === id ? updatedUser : user));
+  res.send('Usuário atualizado com sucesso!');
 });
 
 /**
@@ -675,9 +720,9 @@ router.put('/users/:id', (req, res) => {
  *         description: The user was not found
  */
 router.delete('/users/:id', (req, res) => {
-    const id = req.params.id;
-    users = users.filter(user => user.id !== id);
-    res.send('Usuário deletado com sucesso!');
+  const id = req.params.id;
+  users = users.filter((user) => user.id !== id);
+  res.send('Usuário deletado com sucesso!');
 });
 
 module.exports = router;
@@ -686,10 +731,13 @@ module.exports = router;
 ### Passo 8: Adicionar o sqlLite no projeto
 
 1. Instale as depedências:
+
 ```bash
 npm install sqlite3 sequelize
 ```
+
 2. **crie um arquivo chamado `database.js` na pasta src** e adicione o seguinte código:
+
 ```javascript
 // filepath: /home/professor/Projetos/user-api-v2/src/database.js
 const { Sequelize } = require('sequelize');
@@ -697,12 +745,14 @@ const path = require('path');
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: path.join(__dirname, 'database.sqlite')
+  storage: path.join(__dirname, 'database.sqlite'),
 });
 
 module.exports = sequelize;
 ```
+
 3. **crie um arquivo chamado `user-model.js` na pasta models** e adicione o seguinte código:
+
 ```javascript
 // filepath: /home/professor/Projetos/user-api-v2/src/models/user-model.js
 const { DataTypes } = require('sequelize');
@@ -711,18 +761,19 @@ const sequelize = require('../database');
 const User = sequelize.define('User', {
   id: {
     type: DataTypes.STRING,
-    primaryKey: true
+    primaryKey: true,
   },
   name: {
     type: DataTypes.STRING,
-    allowNull: false
-  }
+    allowNull: false,
+  },
 });
 
 module.exports = User;
 ```
 
 4. **Altere o arquivo chamado `server.js` na pasta src** e adicione o seguinte código:
+
 ```javascript
 ...
 const sequelize = require('./database'); // Importar a configuração do banco de dados
@@ -738,7 +789,9 @@ sequelize.sync().then(() => {
 });
 ...
 ```
+
 5. **Altere o arquivo chamado `userRoutes.js` na pasta src** e adicione o seguinte código:
+
 ```javascript
 // filepath: /home/professor/Projetos/user-api-v2/src/routes/userRoutes.js
 const express = require('express');
@@ -746,65 +799,69 @@ const User = require('../models/user-model');
 const router = express.Router();
 
 router.post('/users', async (req, res) => {
-    try {
-        const user = await User.create(req.body);
-        res.status(201).json(user);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
+  try {
+    const user = await User.create(req.body);
+    res.status(201).json(user);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 });
 
 router.get('/users', async (req, res) => {
-    try {
-        const users = await User.findAll();
-        res.json(users);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+  try {
+    const users = await User.findAll();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 router.put('/users/:id', async (req, res) => {
-    try {
-        const user = await User.findByPk(req.params.id);
-        if (user) {
-            await user.update(req.body);
-            res.json(user);
-        } else {
-            res.status(404).json({ error: 'User not found' });
-        }
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+  try {
+    const user = await User.findByPk(req.params.id);
+    if (user) {
+      await user.update(req.body);
+      res.json(user);
+    } else {
+      res.status(404).json({ error: 'User not found' });
     }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 });
 
 router.delete('/users/:id', async (req, res) => {
-    try {
-        const user = await User.findByPk(req.params.id);
-        if (user) {
-            await user.destroy();
-            res.json({ message: 'User deleted' });
-        } else {
-            res.status(404).json({ error: 'User not found' });
-        }
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+  try {
+    const user = await User.findByPk(req.params.id);
+    if (user) {
+      await user.destroy();
+      res.json({ message: 'User deleted' });
+    } else {
+      res.status(404).json({ error: 'User not found' });
     }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 module.exports = router;
 ```
 
 ### Passo 9: Adicionar o dotenv no projeto
+
 ```bash
 npm install dotenv
 ```
+
 1. **crie um arquivo chamado `.env` na pasta src** e adicione o seguinte código:
+
 ```
 PORT=3000
 DATABASE_URL=postgres://user:password@localhost:5432/mydatabase
 ```
 
 2. **Altere o arquivo server.js** e adicione o seguinte código:
+
 ```javascript
 require('dotenv').config();
 
@@ -830,7 +887,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Redireciona a página root (/) para /api-docs
 app.get('/', (req, res) => {
-    res.redirect('/api-docs');
+  res.redirect('/api-docs');
 });
 
 app.use(middlewares.cors);
@@ -838,161 +895,173 @@ app.use(middlewares.contentType);
 app.use(middlewares.bodyParser);
 
 // Carregar dinamicamente todas as rotas na pasta 'routes'
-fs.readdirSync(path.join(__dirname, 'routes')).forEach(file => {
-    const route = require(`./routes/${file}`);
-    app.use('/api', route);
+fs.readdirSync(path.join(__dirname, 'routes')).forEach((file) => {
+  const route = require(`./routes/${file}`);
+  app.use('/api', route);
 });
 
 // Função para iniciar o servidor em uma porta específica
 const startServer = (port) => {
-    app.listen(port, () => {
-        console.log(`Servidor rodando na porta ${port}`);
-        console.log(`Documentação da API disponível em http://localhost:${port}/api-docs`);
-    }).on('error', (err) => {
-        if (err.code === 'EADDRINUSE') {
-            console.log(`Porta ${port} está ocupada.`);
-            const newPort = port + 1;
-            promptUserForNewPort(newPort);
-        } else {
-            console.error(err);
-        }
+  app
+    .listen(port, () => {
+      console.log(`Servidor rodando na porta ${port}`);
+      console.log(
+        `Documentação da API disponível em http://localhost:${port}/api-docs`
+      );
+    })
+    .on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.log(`Porta ${port} está ocupada.`);
+        const newPort = port + 1;
+        promptUserForNewPort(newPort);
+      } else {
+        console.error(err);
+      }
     });
 };
 
 // Função para perguntar ao usuário se deseja usar a nova porta
 const promptUserForNewPort = (newPort) => {
-    prompt.start();
-    const schema = {
-        properties: {
-            useNewPort: {
-                description: `Porta ${newPort} está disponível. Deseja usar essa porta? (sim/não)`,
-                pattern: /^(sim|não|s|n)$/i,
-                message: 'Responda com "sim" ou "não"',
-                required: true
-            }
-        }
-    };
+  prompt.start();
+  const schema = {
+    properties: {
+      useNewPort: {
+        description: `Porta ${newPort} está disponível. Deseja usar essa porta? (sim/não)`,
+        pattern: /^(sim|não|s|n)$/i,
+        message: 'Responda com "sim" ou "não"',
+        required: true,
+      },
+    },
+  };
 
-    prompt.get(schema, (err, result) => {
-        if (result.useNewPort.toLowerCase() === 'sim' || result.useNewPort.toLowerCase() === 's') {
-            startServer(newPort);
-        } else {
-            console.log('Servidor não iniciado.');
-        }
-    });
+  prompt.get(schema, (err, result) => {
+    if (
+      result.useNewPort.toLowerCase() === 'sim' ||
+      result.useNewPort.toLowerCase() === 's'
+    ) {
+      startServer(newPort);
+    } else {
+      console.log('Servidor não iniciado.');
+    }
+  });
 };
 
 // Iniciar o servidor na porta inicial
 // Sincronizar o banco de dados e iniciar o servidor
-sequelize.sync().then(() => {
+sequelize
+  .sync()
+  .then(() => {
     console.log('Banco de dados sincronizado');
     startServer(initialPort);
-}).catch(err => {
+  })
+  .catch((err) => {
     console.error('Erro ao sincronizar o banco de dados:', err);
-});
+  });
 ```
 
 ### Passo 9: Uso de Controller
 
 **adicione a biblioteca do bcrypt**
+
 ```bash
 npm install bcrypt
 ```
 
 1. **crie um arquivo chamado `criar-usuario.js` na pasta controllers** e adicione o seguinte código:
+
 ```javascript
 const User = require('../models/user-model');
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
 class CriarUsuarioController {
-
-    /**
+  /**
    * @param {HttpRequest} request - Objeto da requisição HTTP
    * @returns {Promise<HttpResponse>}
    */
-    async handle(httpRequest) {
-        try {
-            const { nome, email, senha } = httpRequest.body;
+  async handle(httpRequest) {
+    try {
+      const { nome, email, senha } = httpRequest.body;
 
-            const salt = 10;
+      const salt = 10;
 
-            const senhaCriptografada = await bcrypt.hash(senha, salt)
+      const senhaCriptografada = await bcrypt.hash(senha, salt);
 
-            const usuario = await User.create({
-                nome,
-                email,
-                senha: senhaCriptografada,
-            });
+      const usuario = await User.create({
+        nome,
+        email,
+        senha: senhaCriptografada,
+      });
 
-            return {
-                statusCode: 201,
-                body: usuario,
-            };
-        } catch (error) {
-            return {
-                statusCode: 500,
-                body: { error: error.message }, 
-            };
-        }
+      return {
+        statusCode: 201,
+        body: usuario,
+      };
+    } catch (error) {
+      return {
+        statusCode: 500,
+        body: { error: error.message },
+      };
     }
+  }
 }
 
 module.exports = CriarUsuarioController;
 ```
 
 2. **crie um arquivo chamado `editar-usuario.js` na pasta controllers** e adicione o seguinte código:
+
 ```javascript
 const User = require('../models/user-model');
 class EditarUsuarioController {
-    async handle(req, res) {
-        const { id } = req.params;
-        const { nome, email, senha } = req.body;
-        try {
-            const usuario = await User.findByPk(id);
-            if (!usuario) {
-                return {
-                    statusCode: 404,
-                    body: { error: 'Usuário não encontrado' }
-                }
-            }
-            await usuario.update({
-                nome,
-                email,
-                senha,
-            });
-            return {
-                statusCode: 200,
-                body: usuario,
-            };
-        } catch (error) {
-            return {
-                statusCode: 500,
-                body: { error: error.message }
-            }
-        }
+  async handle(req, res) {
+    const { id } = req.params;
+    const { nome, email, senha } = req.body;
+    try {
+      const usuario = await User.findByPk(id);
+      if (!usuario) {
+        return {
+          statusCode: 404,
+          body: { error: 'Usuário não encontrado' },
+        };
+      }
+      await usuario.update({
+        nome,
+        email,
+        senha,
+      });
+      return {
+        statusCode: 200,
+        body: usuario,
+      };
+    } catch (error) {
+      return {
+        statusCode: 500,
+        body: { error: error.message },
+      };
     }
+  }
 }
 
 module.exports = EditarUsuarioController;
 ```
 
 3. **crie um arquivo chamado `listar-usuario.js` na pasta controllers** e adicione o seguinte código:
+
 ```javascript
 const User = require('../models/user-model');
 
 class ListarUsuarioController {
   async handle(req, res) {
     try {
-        const usuarios = await User.findAll();
-        return {
-            statusCode: 200,
-            body: usuarios,
-        };
+      const usuarios = await User.findAll();
+      return {
+        statusCode: 200,
+        body: usuarios,
+      };
     } catch (error) {
       return {
         statusCode: 500,
         body: { error: error.message },
       };
-        
     }
   }
 }
@@ -1001,39 +1070,40 @@ module.exports = ListarUsuarioController;
 ```
 
 4. **crie um arquivo chamado `deletar-usuario.js` na pasta controllers** e adicione o seguinte código:
+
 ```javascript
 const User = require('../models/user-model');
 class DeletarUsuarioController {
-    async handle(req, res) {
-        const { id } = req.params;
-        try {
-            const usuario = await User.findByPk(id);
+  async handle(req, res) {
+    const { id } = req.params;
+    try {
+      const usuario = await User.findByPk(id);
 
-            if (!usuario) {
-                return {
-                    statusCode: 404,
-                    body: { error: 'Usuário não encontrado' },
-                };
-            }
-            await usuario.destroy();
-            return {
-                statusCode: 204,
-                body: {},
-            };
-        }
-        catch (error) {
-            return {
-                statusCode: 500,
-                body: { error: error.message },
-            };
-        }  
+      if (!usuario) {
+        return {
+          statusCode: 404,
+          body: { error: 'Usuário não encontrado' },
+        };
+      }
+      await usuario.destroy();
+      return {
+        statusCode: 204,
+        body: {},
+      };
+    } catch (error) {
+      return {
+        statusCode: 500,
+        body: { error: error.message },
+      };
     }
+  }
 }
 
 module.exports = DeletarUsuarioController;
 ```
 
 5. **Altere o arquivo userRoutes.js** e adicione o seguinte código:
+
 ```javascript
 const express = require('express');
 const router = express.Router();
@@ -1044,7 +1114,6 @@ const ListarUsuarioController = require('../controllers/listar-usuario');
 const EditarUsuarioController = require('../controllers/editar-usuario');
 const DeletarUsuarioController = require('../controllers/deletar-usuario');
 const adaptRoute = require('../adapters/express-route-adapter');
-
 
 /**
  * @swagger
@@ -1174,12 +1243,13 @@ module.exports = router;
 ```
 
 6. **Altere o arquivo express-route-adapter.js** e adicione o seguinte código:
+
 ```javascript
 const adaptRoute = (controller) => {
   return async function (req, res) {
     const httpRequest = {
       body: req?.body,
-      params: req?.params
+      params: req?.params,
     };
     const httpResponse = await controller.handle(httpRequest);
     res.status(httpResponse.statusCode).json(httpResponse.body);
@@ -1190,6 +1260,7 @@ module.exports = adaptRoute;
 ```
 
 ### Passo 10: Criação de Login
+
 1. **crie um arquivo chamado `loginRoutes.js` na pasta routes** e adicione o seguinte código:
 
 ```javascript
@@ -1261,54 +1332,59 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 class LoginController {
-    /**
-     * @param {HttpRequest} httpRequest - Objeto da requisição HTTP
-     * @returns {Promise<HttpResponse>}
-     */
-    async handle(httpRequest) {
-        try {
-            const { email, senha } = httpRequest.body;
+  /**
+   * @param {HttpRequest} httpRequest - Objeto da requisição HTTP
+   * @returns {Promise<HttpResponse>}
+   */
+  async handle(httpRequest) {
+    try {
+      const { email, senha } = httpRequest.body;
 
-            // Verificar se o usuário existe no banco de dados
-            const user = await User.findOne({ where: { email } });
-            if (!user) {
-                return {
-                    statusCode: 404,
-                    body: { message: 'Usuário não encontrado' }
-                };
-            }
+      // Verificar se o usuário existe no banco de dados
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        return {
+          statusCode: 404,
+          body: { message: 'Usuário não encontrado' },
+        };
+      }
 
-            // Comparar a senha recebida com a senha criptografada
-            const senhEhValida = await bcrypt.compare(senha, user.senha);
-            if (!senhEhValida) {
-                return {
-                    statusCode: 401,
-                    body: { message: 'Credenciais inválidas' }
-                };
-            }
+      // Comparar a senha recebida com a senha criptografada
+      const senhEhValida = await bcrypt.compare(senha, user.senha);
+      if (!senhEhValida) {
+        return {
+          statusCode: 401,
+          body: { message: 'Credenciais inválidas' },
+        };
+      }
 
-            // Gerar o token JWT
-            const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
-                expiresIn: process.env.JWT_EXPIRES_IN // Token válido por 1 hora
-            });
-
-            return {
-                statusCode: 200,
-                body: { token }
-            };
-        } catch (error) {
-            return {
-                statusCode: 500,
-                body: { message: 'Erro interno do servidor', error: error.message }
-            };
+      // Gerar o token JWT
+      const token = jwt.sign(
+        { id: user.id, email: user.email },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: process.env.JWT_EXPIRES_IN, // Token válido por 1 hora
         }
+      );
+
+      return {
+        statusCode: 200,
+        body: { token },
+      };
+    } catch (error) {
+      return {
+        statusCode: 500,
+        body: { message: 'Erro interno do servidor', error: error.message },
+      };
     }
+  }
 }
 
 module.exports = LoginController;
 ```
 
 3. **Altere o arquivo userRoutes.js** e adicione o seguinte código:
+
 ```javascript
 const express = require('express');
 const router = express.Router();
@@ -1318,7 +1394,6 @@ const ListarUsuarioController = require('../controllers/listar-usuario');
 const EditarUsuarioController = require('../controllers/editar-usuario');
 const DeletarUsuarioController = require('../controllers/deletar-usuario');
 const authMiddleware = require('../middlewares/auth-middleware');
-
 
 /**
  * @swagger
@@ -1384,7 +1459,11 @@ const authMiddleware = require('../middlewares/auth-middleware');
  *       500:
  *         description: Algum erro aconteceu
  */
-router.post('/users', authMiddleware, routeAdapter(new CriarUsuarioController()));
+router.post(
+  '/users',
+  authMiddleware,
+  routeAdapter(new CriarUsuarioController())
+);
 
 /**
  * @swagger
@@ -1465,25 +1544,25 @@ module.exports = router;
 const jwt = require('jsonwebtoken');
 
 const authMiddleware = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
+  const authHeader = req.headers['authorization'];
 
-    if (!authHeader) {
-        return res.status(401).json({ message: 'Token não fornecido' });
-    }
+  if (!authHeader) {
+    return res.status(401).json({ message: 'Token não fornecido' });
+  }
 
-    const token = authHeader.split(' ')[1]; // Extrai o token do formato "Bearer <token>"
+  const token = authHeader.split(' ')[1]; // Extrai o token do formato "Bearer <token>"
 
-    if (!token) {
-        return res.status(401).json({ message: 'Token inválido' });
-    }
+  if (!token) {
+    return res.status(401).json({ message: 'Token inválido' });
+  }
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Valida o token
-        req.user = decoded; // Adiciona os dados do usuário decodificados ao objeto da requisição
-        next(); // Continua para a próxima função
-    } catch (error) {
-        return res.status(403).json({ message: 'Token inválido ou expirado' });
-    }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Valida o token
+    req.user = decoded; // Adiciona os dados do usuário decodificados ao objeto da requisição
+    next(); // Continua para a próxima função
+  } catch (error) {
+    return res.status(403).json({ message: 'Token inválido ou expirado' });
+  }
 };
 
 module.exports = authMiddleware;
@@ -1492,11 +1571,13 @@ module.exports = authMiddleware;
 ### Passo 11: Criação de Seed
 
 1. **Rode o comando:**:
+
 ```bash
 npm install --save-dev sequelize-cli
 ```
 
 2. **Altere o arquivo package.json** e adicione o seguinte código:
+
 ```javascript
 ...
 "scripts": {
@@ -1504,15 +1585,21 @@ npm install --save-dev sequelize-cli
 }
 ...
 ```
+
 3. **Rode o comando:**:
+
 ```bash
 npx sequelize init --migrations-path=src/migrations --seeders-path=src/seeders --models-path=src/models --config=src/config.json
 ```
+
 4. **Rode o comando:**:
+
 ```bash
 npx sequelize seed:generate --name create-admin-user
 ```
+
 5. **Altere o arquivo YYYYMMDDHHMMSS-create-admin-user.js criado em seeders** e adicione o seguinte código:
+
 ```javascript
 'use strict';
 
@@ -1535,15 +1622,23 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.bulkDelete('Users', { email: 'admin@example.com' }, {});
+    return queryInterface.bulkDelete(
+      'Users',
+      { email: 'admin@example.com' },
+      {}
+    );
   },
 };
 ```
+
 6. **Rode o comando:**:
+
 ```bash
 npx sequelize db:seed:all
 ```
+
 7. **Rode o comando:**:
+
 ```bash
 npx sequelize db:migrate && npx sequelize db:seed:all
 ```
@@ -1551,15 +1646,27 @@ npx sequelize db:migrate && npx sequelize db:seed:all
 1. **crie um arquivo chamado `auth-middleware.js` na pasta controllers** e adicione o seguinte código:
 
 ```javascript
+
 ```
+
 1. **Altere o arquivo userRoutes.js** e adicione o seguinte código:
+
 ```javascript
+
 ```
 
 1. **Instale**:
+
 ```bash
+npm install eslint eslint-config-airbnb-base eslint-plugin-import --save-dev
+
+npx eslint --init
+
+npm install --save-dev prettier --legacy-peer-deps
 ```
 
 1. **Rode o comando:**:
+
 ```bash
+
 ```

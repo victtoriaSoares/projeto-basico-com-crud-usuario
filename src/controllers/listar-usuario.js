@@ -1,7 +1,7 @@
 const User = require('../models/user-model');
 
 class ListarUsuarioController {
-  async handle(req, res) {
+  async handle(req) {
     try {
       const userId = req.params?.id;
       const usuario = await User.findByPk(userId);
@@ -26,7 +26,6 @@ class ListarUsuarioController {
         statusCode: 500,
         body: { error: error.message },
       };
-
     }
   }
 }

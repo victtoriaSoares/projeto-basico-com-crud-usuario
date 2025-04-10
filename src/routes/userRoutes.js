@@ -7,7 +7,6 @@ const EditarUsuarioController = require('../controllers/editar-usuario');
 const DeletarUsuarioController = require('../controllers/deletar-usuario');
 const authMiddleware = require('../middlewares/auth-middleware');
 
-
 /**
  * @swagger
  * components:
@@ -99,7 +98,11 @@ router.post('/users', routeAdapter(new CriarUsuarioController()));
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-router.get('/users/:id?', authMiddleware, routeAdapter(new ListarUsuarioController()));
+router.get(
+  '/users/:id?',
+  authMiddleware,
+  routeAdapter(new ListarUsuarioController())
+);
 
 /**
  * @swagger
@@ -130,7 +133,11 @@ router.get('/users/:id?', authMiddleware, routeAdapter(new ListarUsuarioControll
  *       500:
  *         description: Algum erro aconteceu
  */
-router.put('/users/:id', authMiddleware, routeAdapter(new EditarUsuarioController()));
+router.put(
+  '/users/:id',
+  authMiddleware,
+  routeAdapter(new EditarUsuarioController())
+);
 
 /**
  * @swagger
@@ -155,6 +162,10 @@ router.put('/users/:id', authMiddleware, routeAdapter(new EditarUsuarioControlle
  *       500:
  *         description: Algum erro aconteceu
  */
-router.delete('/users/:id', authMiddleware, routeAdapter(new DeletarUsuarioController()));
+router.delete(
+  '/users/:id',
+  authMiddleware,
+  routeAdapter(new DeletarUsuarioController())
+);
 
 module.exports = router;

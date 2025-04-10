@@ -1,5 +1,5 @@
 module.exports = {
-    bodyParser: require('./body-parser'),
-    contentType: require('./content-type'),
-    cors: require('./cors')
+  bodyParser: require('./body-parser'),
+  contentType: require('./content-type'),
+  cors: require('./cors'),
 };

@@ -39,9 +39,16 @@ class LoginController {
         }
       );
 
+      // Gere o refresh token
+      const refreshToken = jwt.sign(
+        { id: user.id },
+        process.env.JWT_REFRESH_SECRET,
+        { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' } // Refresh token expira em 7 dias
+      );
+
       return {
         statusCode: 200,
-        body: { token },
+        body: { token, refreshToken },
       };
     } catch (error) {
       return {

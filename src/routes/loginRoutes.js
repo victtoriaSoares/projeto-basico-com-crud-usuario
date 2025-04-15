@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const routeAdapter = require('../adapters/express-route-adapter');
 const LoginController = require('../controllers/login-controller');
+const RefreshTokenController = require('../controllers/refresh-token');
 
 /**
  * @swagger
@@ -46,6 +47,12 @@ const LoginController = require('../controllers/login-controller');
  *                 token:
  *                   type: string
  *                   description: Token JWT gerado
+ *                 refreshToken:
+ *                   type: string
+ *                   description: Token de atualização gerado
+ *               example:
+ *                 token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+ *                 refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
  *       401:
  *         description: Credenciais inválidas
  *       404:
@@ -55,4 +62,45 @@ const LoginController = require('../controllers/login-controller');
  */
 router.post('/login', routeAdapter(new LoginController()));
 
+/**
+ * @swagger
+ * /api/refresh-token:
+ *  post:
+ *    summary: Gera um novo token de acesso
+ *    tags: [Auth]
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            required:
+ *              - refreshToken
+ *            properties:
+ *              refreshToken:
+ *                type: string
+ *                description: Token de atualização
+ *            example:
+ *              refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NjczNzU1LCJleHAiOjE3NDUyNzg1NTV9.OfY7EqHxukKFa0rLMtAuo0TWj2DGJ3q5gd53TMd7Kvs
+ *    responses:
+ *      200:
+ *        description: Token de acesso gerado com sucesso
+ *        content:
+ *          application/json:
+ *            schema:
+ *            type: object
+ *            properties:
+ *              token:
+ *                type: string
+ *                description: Token de acesso gerado
+ *            example:
+ *              token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NjczNzU1LCJleHAiOjE3NDUyNzg1NTV9.OfY7EqHxukKFa0rLMtAuo0TWj2DGJ3q5gd53TMd7Kvs
+ *      400:
+ *        description: Token de atualização não fornecido
+ *      403:
+ *        description: Token de atualização inválido
+ *      500:
+ *        description: Erro interno do servidor
+ */
+router.post('/refresh-token', routeAdapter(new RefreshTokenController()));
 module.exports = router;

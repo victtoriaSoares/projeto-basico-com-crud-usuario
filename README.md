@@ -1635,3 +1635,60 @@ module.exports = {
 ```javascript
 
 ```
+
+## USANDO MYSQL SERVER NA API
+1. **Rode o comando para instalar a biblioteca do mysql2:**:
+
+```bash
+npm install --save mysql2 --legacy-peer-deps
+```
+
+2. **Rode o seguinte comando para inicializar o servidor de banco de dados:**:
+
+```bash
+sudo service mysql start
+```
+
+3. **Altere o arquivo config.json e insira o seguinte código:**
+
+```json
+{
+    "development":{
+        "dialect": "mysql",
+        "host": "0.0.0.0",
+        "database": "db_app",
+        "username": "user_app",
+        "password": "Senha@123",
+        "port": 3306
+    }
+}
+```
+
+4. **Altere o arquivo database.js e insira o seguinte código:**
+
+```javascript
+const { Sequelize } = require('sequelize');
+const config = require('../config/config.json');
+
+// Determinar o ambiente atual (default: development)
+// eslint-disable-next-line no-undef
+const env = process.env.NODE_ENV || 'development';
+
+// Carregar as configurações do ambiente atual
+const dbConfig = config[env];
+
+// Inicializar o Sequelize com as configurações carregadas
+const sequelize = new Sequelize(
+  dbConfig.database, // Nome do banco de dados
+  dbConfig.username, // Usuário do banco
+  dbConfig.password, // Senha do banco
+  {
+    host: dbConfig.host, // Host do banco de dados
+    dialect: dbConfig.dialect, // Dialeto (mysql)
+    port: dbConfig.port, // Porta do banco de dados
+    logging: dbConfig.logging || false, // Desabilitar logs do Sequelize (opcional)
+  }
+);
+
+module.exports = sequelize;
+```

@@ -2,10 +2,12 @@
   "name": "user-api",
   "version": "1.0.0",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node -r dotenv/config ./src/server.js dotenv_config_path=./.env",
-    "sequelize": "sequelize",
+    "dev": "sucrase-node src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
     "lint": "eslint .",
     "format": "prettier --write ."
   },

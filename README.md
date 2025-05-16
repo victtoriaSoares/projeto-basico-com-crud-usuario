@@ -1692,3 +1692,122 @@ const sequelize = new Sequelize(
 
 module.exports = sequelize;
 ```
+
+## ADICIONANDO TYPESCRIPT AO PROJETO
+1. **Rode o seguinte código para instalar as dependências:**
+
+```bash
+npm install --save-dev sucrase typescript @types/node
+```
+
+2. **Crie o arquivo tsconfig.json na raiz do projeto:**
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+2. **Altere o arquivo package.json na raiz do projeto:**
+```json
+{
+  "name": "user-api",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "sucrase-node src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.1",
+    "prompt": "^1.3.0",
+    "sequelize": "^6.37.6",
+    "sqlite3": "^5.1.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.24.0",
+    "eslint": "^9.24.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.31.0",
+    "globals": "^16.0.0",
+    "prettier": "^3.5.3",
+    "sequelize-cli": "^6.6.2"
+  }
+}
+```
+
+3. **Crie o arquivo .sucraseconfig.js na raiz do projeto:**
+```javascript
+module.exports = {
+  transforms: ['typescript', 'imports'],
+};
+```
+
+4. **Rode o comando para instalar a biblioteca os tipos:**:
+```bash
+npm install --save-dev @types/express @types/jsonwebtoken
+```
+
+5. **Altere o arquivo server.ts e insira o seguinte código:**
+```javascript
+import express from 'express';
+import sequelize from './database';
+import middlewares from './middlewares';
+import { swaggerUi, specs } from './swaggerConfig';
+import fs from 'fs';
+import path from 'path';
+
+const app = express();
+const initialPort = process.env.PORT || 3000;
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+app.get('/', (req, res) => {
+  res.redirect('/api-docs');
+});
+
+app.use(middlewares.cors);
+app.use(middlewares.contentType);
+app.use(middlewares.bodyParser);
+
+fs.readdirSync(path.join(__dirname, 'routes')).forEach((file) => {
+  const route = require(`./routes/${file}`);
+  app.use('/api', route);
+});
+
+const startServer = (port: number) => {
+  app.listen(port, () => {
+    console.log(`Servidor rodando na porta ${port}`);
+  });
+};
+
+sequelize.sync().then(() => {
+  startServer(Number(initialPort));
+});
+```

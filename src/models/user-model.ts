@@ -5,6 +5,7 @@ export class User extends Model {
   id!: number;
   email!: string;
   senha!: string;
+  nome!: string;
 }
 
 User.init(
@@ -22,6 +23,10 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    nome: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    }
   },
   {
     sequelize,

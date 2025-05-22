@@ -5,7 +5,6 @@ class CriarUsuarioController {
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
       const { nome, email, senha } = httpRequest.body;
-      console.log(httpRequest.body)
 
       const salt = 10;
 

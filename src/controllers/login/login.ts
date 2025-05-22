@@ -1,6 +1,8 @@
 import User from '../../models/user-model';
 import bcrypt from 'bcrypt';
 import { Controller, HttpRequest, HttpResponse } from '../../interfaces';
+import jwt, { SignOptions } from 'jsonwebtoken';
+import { ENV } from '../../config/env';
 
 export class LoginController implements Controller {
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
@@ -25,10 +27,38 @@ export class LoginController implements Controller {
         };
       }
 
+      // Configurações para o access token
+      const accessTokenOptions: SignOptions = {
+        expiresIn: (ENV.JWT_EXPIRES_IN as SignOptions['expiresIn']) || '15m',
+      };
+
+      // Configurações para o refresh token
+      const refreshTokenOptions: SignOptions = {
+        expiresIn: (ENV.JWT_REFRESH_EXPIRES_IN as SignOptions['expiresIn']) || '7d',
+      };
+
+      // Gerar o access token
+      const accessToken = jwt.sign(
+        { id: user.id, email: user.email },
+        ENV.JWT_SECRET || 'default_secret',
+        accessTokenOptions
+      );
+
+      // Gerar o refresh token
+      const refreshToken = jwt.sign(
+        { id: user.id },
+        ENV.JWT_REFRESH_SECRET || 'default_refresh_secret',
+        refreshTokenOptions
+      );
+
       // Retornar sucesso (você pode adicionar lógica para gerar tokens aqui)
       return {
         statusCode: 200,
-        body: { message: 'Login realizado com sucesso' },
+        body: {
+          message: 'Login realizado com sucesso',
+          accessToken,
+          refreshToken,
+        },
       };
     } catch (error) {
       console.error('Erro no login:', error);

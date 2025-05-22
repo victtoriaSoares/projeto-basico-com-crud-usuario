@@ -30,7 +30,7 @@ export default (router: Router): void => {
    *                 $ref: '#/components/schemas/User'
    */
   router.get(
-    "/users/:id",
+    "/users{/:id}",
     authMiddleware,
     adaptRoute(new ListarUsuarioController())
   );

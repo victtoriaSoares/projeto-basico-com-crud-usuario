@@ -1,7 +1,8 @@
-const User = require('../models/user-model');
-class DeletarUsuarioController {
-  async handle(req) {
-    const { id } = req.params;
+import { Controller, HttpRequest, HttpResponse } from '../../interfaces';
+import  User from '../../models/user-model';
+class DeletarUsuarioController implements Controller {
+  async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
+    const { id } = httpRequest.params;
     try {
       const usuario = await User.findByPk(id);
 
@@ -16,7 +17,7 @@ class DeletarUsuarioController {
         statusCode: 204,
         body: {},
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         statusCode: 500,
         body: { error: error.message },
@@ -25,4 +26,4 @@ class DeletarUsuarioController {
   }
 }
 
-module.exports = DeletarUsuarioController;
+export default DeletarUsuarioController;

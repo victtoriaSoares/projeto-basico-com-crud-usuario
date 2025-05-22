@@ -1,9 +1,10 @@
-const User = require('../models/user-model');
+import { Controller, HttpRequest, HttpResponse } from '../../interfaces';
+import User from '../../models/user-model';
 
-class ListarUsuarioController {
-  async handle(req) {
+class ListarUsuarioController implements Controller {
+  async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
-      const userId = req.params?.id;
+      const userId = httpRequest.params.id;
       const usuario = await User.findByPk(userId);
       if (!usuario && userId) {
         return {
@@ -21,7 +22,7 @@ class ListarUsuarioController {
         statusCode: 200,
         body: usuarios,
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         statusCode: 500,
         body: { error: error.message },
@@ -30,4 +31,4 @@ class ListarUsuarioController {
   }
 }
 
-module.exports = ListarUsuarioController;
+export default ListarUsuarioController;

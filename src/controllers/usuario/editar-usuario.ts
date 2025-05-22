@@ -1,8 +1,9 @@
-const User = require('../models/user-model');
-class EditarUsuarioController {
-  async handle(req) {
-    const { id } = req.params;
-    const { nome, email, senha } = req.body;
+import { Controller, HttpRequest, HttpResponse } from '../../interfaces';
+import User from '../../models/user-model';
+class EditarUsuarioController implements Controller {
+  async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
+    const { id } = httpRequest.params;
+    const { nome, email, senha } = httpRequest.body;
     try {
       const usuario = await User.findByPk(id);
       if (!usuario) {
@@ -20,7 +21,7 @@ class EditarUsuarioController {
         statusCode: 200,
         body: usuario,
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         statusCode: 500,
         body: { error: error.message },
@@ -29,4 +30,4 @@ class EditarUsuarioController {
   }
 }
 
-module.exports = EditarUsuarioController;
+export default EditarUsuarioController;

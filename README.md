@@ -1,19 +1,4 @@
-```bash
-  mkdir -p src/adapters src/controllers/login src/controllers/usuario src/middlewares src/models src/routes src/config src/interfaces
-```
-
-```bash
-  touch src/database.ts src/server.ts src/swaggerConfig.ts src/adapters/express-route-adapter.ts src/controllers/usuario/criar-usuario.ts src/controllers/usuario/listar-usuario.ts src/controllers/usuario/editar-usuario.ts src/controllers/usuario/deletar-usuario.ts src/controllers/login/login.ts src/controllers/login/refresh-token.ts src/middlewares/auth-middleware.ts src/middlewares/body-parser.ts src/middlewares/content-type.ts src/middlewares/cors.ts src/middlewares/index.ts src/models/user-model.ts src/routes/loginRoutes.ts src/routes/userRoutes.ts src/interfaces/index.ts src/config/app.ts src/config/config.json src/config/env.ts src/config/middlewares.ts src/config/routes.ts tsconfig.json nodemon.json .env .env-exemplo .gitignore
-```
-
-```bash
-  yarn add -D @types/bcrypt @types/express @types/jsonwebtoken @types/node sucrase ts-node typescript nodemon @types/swagger-ui-express @types/swagger-jsdoc @types/dotenv
-```
-
-```bash
-  yarn add bcrypt express jsonwebtoken mysql2 sequelize swagger-jsdoc swagger-ui-express dotenv fast-glob
-```
-
+### Inicio do projeto primeiras aulas
 ### Passo 1: Configuração do Projeto
 
 1. **Crie uma pasta para o projeto** e navegue até ela no terminal:
@@ -1710,23 +1695,57 @@ module.exports = sequelize;
 ```
 
 ## ADICIONANDO TYPESCRIPT AO PROJETO
-1. **Rode o seguinte código para instalar as dependências:**
 
+### COMANDOS PARA INICIAR UMA APLICAÇÃO NODE TYPESCRIPT
+1. Iniciar o package.json
 ```bash
-npm install --save-dev sucrase typescript @types/node --legacy-peer-deps ## npm
-yarn add -D sucrase typescript @types/node ## yarn
+  yarn init -y
+```
+```bash
+  npm init -y
 ```
 
+2. Criar as pastas de organização do projeto
+```bash
+  mkdir -p src/adapters src/controllers/login src/controllers/usuario src/middlewares src/models src/routes src/config src/interfaces
+```
+
+3. Criar os principais arquivos de configuração
+```bash
+  touch src/database.ts src/server.ts src/swaggerConfig.ts src/adapters/express-route-adapter.ts src/controllers/usuario/criar-usuario.ts src/controllers/usuario/listar-usuario.ts src/controllers/usuario/editar-usuario.ts src/controllers/usuario/deletar-usuario.ts src/controllers/login/login.ts src/controllers/login/refresh-token.ts src/middlewares/auth-middleware.ts src/middlewares/body-parser.ts src/middlewares/content-type.ts src/middlewares/cors.ts src/middlewares/index.ts src/models/user-model.ts src/routes/loginRoutes.ts src/routes/userRoutes.ts src/interfaces/index.ts src/config/app.ts src/config/config.json src/config/env.ts src/config/middlewares.ts src/config/routes.ts tsconfig.json nodemon.json .env .env-exemplo .gitignore
+```
+
+4. Adiciona as bibliotecas do ambiente de desenvolvimento
+```bash
+  yarn add -D @types/bcrypt @types/express @types/jsonwebtoken @types/node sucrase ts-node typescript nodemon @types/swagger-ui-express @types/swagger-jsdoc @types/dotenv @types/express
+```
+
+```bash
+  npm install --save-dev @types/bcrypt @types/express @types/jsonwebtoken @types/node sucrase ts-node typescript nodemon @types/swagger-ui-express @types/swagger-jsdoc @types/dotenv @types/express --legacy-peer-deps
+```
+
+5. Adiciona as dependências do ambiente de produção
+```bash
+  yarn add bcrypt express jsonwebtoken mysql2 sequelize swagger-jsdoc swagger-ui-express dotenv fast-glob
+```
+
+```bash
+  npm install --save-dev bcrypt express jsonwebtoken mysql2 sequelize swagger-jsdoc swagger-ui-express dotenv fast-glob --legacy-peer-deps
+```
+## CONFIGURAÇÕES DOS ARQUIVOS
 2. **Crie o arquivo tsconfig.json na raiz do projeto:**
 ```json
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "Node",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "strictNullChecks": false,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
     "rootDir": "./src"
@@ -1739,93 +1758,91 @@ yarn add -D sucrase typescript @types/node ## yarn
 2. **Altere o arquivo package.json na raiz do projeto:**
 ```json
 {
-  "name": "user-api",
+  "name": "base-api-crud-pi-senac-2025",
   "version": "1.0.0",
-  "main": "server.js",
-  "type": "module",
+  "main": "index.js",
+  "license": "MIT",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "sucrase-node src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "lint": "eslint .",
-    "format": "prettier --write ."
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "bcrypt": "^5.1.1",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "jsonwebtoken": "^9.0.2",
-    "mysql2": "^3.14.1",
-    "prompt": "^1.3.0",
-    "sequelize": "^6.37.6",
-    "sqlite3": "^5.1.7",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "start": "nodemon src/server.ts"
   },
   "devDependencies": {
-    "@eslint/js": "^9.24.0",
-    "eslint": "^9.24.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.31.0",
-    "globals": "^16.0.0",
-    "prettier": "^3.5.3",
-    "sequelize-cli": "^6.6.2"
+    "@types/bcrypt": "^5.0.2",
+    "@types/dotenv": "^8.2.3",
+    "@types/express": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^22.15.21",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
+    "nodemon": "^3.1.10",
+    "sucrase": "^3.35.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "fast-glob": "^3.3.3",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.1",
+    "sequelize": "^6.37.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   }
 }
 ```
 
-3. **Crie o arquivo .sucraseconfig.js na raiz do projeto:**
+3. **Altere o arquivo server.ts e insira o seguinte código:**
 ```javascript
-module.exports = {
-  transforms: ['typescript', 'imports'],
+// Bibliotecas
+import sequelize from "./database";
+import { ENV } from "./config/env";
+import { Express } from "express";
+
+// Função para iniciar o servidor em uma porta específica
+const startServer = async (port: number) => {
+  const app = (await import("./config/app")).default;
+  
+  app
+    .listen(port, () => {
+      console.log(`Servidor rodando na porta ${port}`);
+      console.log(
+        `Documentação da API disponível em http://localhost:${port}/api-docs`
+      );
+    })
+    .on("error", (err: any) => {
+      if (err.code === "EADDRINUSE") {
+        console.log(`Porta ${port} está ocupada.`);
+      } else {
+        console.error(err);
+      }
+    });
 };
-```
 
-4. **Rode o comando para instalar a biblioteca os tipos:**:
-```bash
-npm install --save-dev @types/express @types/prompt @types/jsonwebtoken --legacy-peer-deps
-yarn add -D @types/express @types/prompt @types/jsonwebtoken
-```
-
-5. **Altere o arquivo server.ts e insira o seguinte código:**
-```javascript
-import express from 'express';
-import sequelize from './database';
-import middlewares from './middlewares';
-import { swaggerUi, specs } from './swaggerConfig';
-import fs from 'fs';
-import path from 'path';
-
-const app = express();
-const initialPort = process.env.PORT || 3000;
-
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
-
-app.get('/', (req, res) => {
-  res.redirect('/api-docs');
-});
-
-app.use(middlewares.cors);
-app.use(middlewares.contentType);
-app.use(middlewares.bodyParser);
-
-fs.readdirSync(path.join(__dirname, 'routes')).forEach((file) => {
-  const route = require(`./routes/${file}`);
-  app.use('/api', route);
-});
-
-const startServer = (port: number) => {
-  app.listen(port, () => {
-    console.log(`Servidor rodando na porta ${port}`);
+// Iniciar o servidor na porta inicial
+// Sincronizar o banco de dados e iniciar o servidor
+sequelize
+  .sync()
+  .then(() => {
+    console.log("Banco de dados sincronizado");
+    startServer(Number(ENV.PORT));
+  })
+  .catch((err: any) => {
+    console.error("Erro ao sincronizar o banco de dados:", err);
   });
-};
+```
 
-sequelize.sync().then(() => {
-  startServer(Number(initialPort));
-});
+4. Altere o arquivo na raiz do projeto **nodemon.json e insira o seguinte código:**
+
+```json
+{
+  "watch": ["src"],
+  "ext": "ts,json",
+  "ignore": ["node_modules", "dist"],
+  "exec": "ts-node src/server.ts",
+  "env": {
+    "NODE_ENV": "development",
+    "PORT": "3000"
+  }
+}
 ```

@@ -3,7 +3,7 @@ import contentType from './content-type';
 import cors from './cors';
 import authMiddleware from './auth-middleware';
 
-export default {
+export {
   bodyParser,
   contentType,
   cors,

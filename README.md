@@ -1699,10 +1699,10 @@ module.exports = sequelize;
 ### COMANDOS PARA INICIAR UMA APLICAÇÃO NODE TYPESCRIPT
 1. Iniciar o package.json
 ```bash
-  yarn init -y
+  sudo rm -rf package.json package-lock.json yarn.lock node_modules && yarn init -y
 ```
 ```bash
-  npm init -y
+  sudo rm -rf package.json package-lock.json yarn.lock node_modules && npm init -y
 ```
 
 2. Criar as pastas de organização do projeto

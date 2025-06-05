@@ -38,7 +38,7 @@ export class LoginController implements Controller {
       };
 
       // Gerar o access token
-      const accessToken = jwt.sign(
+      const token = jwt.sign(
         { id: user.id, email: user.email },
         ENV.JWT_SECRET || 'default_secret',
         accessTokenOptions
@@ -56,7 +56,7 @@ export class LoginController implements Controller {
         statusCode: 200,
         body: {
           message: 'Login realizado com sucesso',
-          accessToken,
+          token,
           refreshToken,
         },
       };

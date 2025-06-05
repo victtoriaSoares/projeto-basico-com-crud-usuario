@@ -6,19 +6,24 @@ class ListarUsuarioController implements Controller {
     try {
       const userId = httpRequest.params.id;
       const usuario = await User.findByPk(userId);
-      console.log('userId', userId);
-      if (!usuario && userId !== '{id}') {
+      if (!usuario && userId !== '{id}' && userId !== undefined) {
         return {
           statusCode: 404,
           body: { error: 'Usuário não encontrado' },
         };
-      } else if (userId !== '{id}') {
+      } else if (userId !== '{id}' && userId !== undefined) {
         return {
           statusCode: 200,
           body: usuario,
         };
       }
       const usuarios = await User.findAll();
+      if (usuarios.length === 0) {
+        return {
+          statusCode: 404,
+          body: { error: 'Nenhum usuário encontrado' },
+        };
+      }
       return {
         statusCode: 200,
         body: usuarios,

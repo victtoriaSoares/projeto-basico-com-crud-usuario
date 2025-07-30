@@ -23,6 +23,7 @@ export default (router: Router): void => {
    *         - nome
    *         - senha
    *         - email
+   *         - role
    *       properties:
    *         nome:
    *           type: string
@@ -33,11 +34,15 @@ export default (router: Router): void => {
    *         email:
    *           type: string
    *           description: O email do usuário
+   *         role:
+   *           type: string
+   *           description: O cargo do usuário
    *       example:
    *         id: 1
    *         nome: "João da Silva"
    *         senha: "123abc"
    *         email: "joao.silva@dominio.com"
+   *         role: "Funcionario"
    */
 
   /**

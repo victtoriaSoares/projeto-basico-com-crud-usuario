@@ -1,8 +1,8 @@
-import User from '../../models/user-model';
-import bcrypt from 'bcrypt';
-import { Controller, HttpRequest, HttpResponse } from '../../interfaces';
-import jwt, { SignOptions } from 'jsonwebtoken';
-import { ENV } from '../../config/env';
+import User from "../../models/user-model";
+import bcrypt from "bcrypt";
+import { Controller, HttpRequest, HttpResponse } from "../../interfaces";
+import jwt, { SignOptions } from "jsonwebtoken";
+import { ENV } from "../../config/env";
 
 export class LoginController implements Controller {
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
@@ -14,7 +14,7 @@ export class LoginController implements Controller {
       if (!user) {
         return {
           statusCode: 404,
-          body: { message: 'Usuário não encontrado' },
+          body: { message: "Usuário não encontrado" },
         };
       }
 
@@ -23,31 +23,32 @@ export class LoginController implements Controller {
       if (!senhaEhValida) {
         return {
           statusCode: 401,
-          body: { message: 'Credenciais inválidas' },
+          body: { message: "Credenciais inválidas" },
         };
       }
 
       // Configurações para o access token
       const accessTokenOptions: SignOptions = {
-        expiresIn: (ENV.JWT_EXPIRES_IN as SignOptions['expiresIn']) || '15m',
+        expiresIn: (ENV.JWT_EXPIRES_IN as SignOptions["expiresIn"]) || "15m",
       };
 
       // Configurações para o refresh token
       const refreshTokenOptions: SignOptions = {
-        expiresIn: (ENV.JWT_REFRESH_EXPIRES_IN as SignOptions['expiresIn']) || '7d',
+        expiresIn:
+          (ENV.JWT_REFRESH_EXPIRES_IN as SignOptions["expiresIn"]) || "7d",
       };
 
       // Gerar o access token
       const token = jwt.sign(
-        { id: user.id, email: user.email },
-        ENV.JWT_SECRET || 'default_secret',
+        { id: user.id, email: user.email, role: user.role },
+        ENV.JWT_SECRET || "default_secret",
         accessTokenOptions
       );
 
       // Gerar o refresh token
       const refreshToken = jwt.sign(
         { id: user.id },
-        ENV.JWT_REFRESH_SECRET || 'default_refresh_secret',
+        ENV.JWT_REFRESH_SECRET || "default_refresh_secret",
         refreshTokenOptions
       );
 
@@ -55,16 +56,16 @@ export class LoginController implements Controller {
       return {
         statusCode: 200,
         body: {
-          message: 'Login realizado com sucesso',
+          message: "Login realizado com sucesso",
           token,
           refreshToken,
         },
       };
     } catch (error) {
-      console.error('Erro no login:', error);
+      console.error("Erro no login:", error);
       return {
         statusCode: 500,
-        body: { message: 'Erro interno do servidor' },
+        body: { message: "Erro interno do servidor" },
       };
     }
   }

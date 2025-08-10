@@ -1,6 +1,6 @@
-import adaptRoute from "../adapters/express-route-adapter";
+import adaptRoute from "../../adapters/express-route-adapter";
 import { Router } from "express";
-import CriarUsuarioController from "../controllers/usuario/criar-usuario";
+import CriarUsuarioController from "../../controllers/usuario/criar-usuario";
 
 export default (router: Router): void => {
   /**
@@ -36,13 +36,13 @@ export default (router: Router): void => {
    *           description: O email do usuário
    *         role:
    *           type: string
-   *           description: O cargo do usuário
+   *           description: O papel do usuário no sistema
    *       example:
    *         id: 1
    *         nome: "João da Silva"
    *         senha: "123abc"
    *         email: "joao.silva@dominio.com"
-   *         role: "Funcionario"
+   *         role: "Gerente"
    */
 
   /**

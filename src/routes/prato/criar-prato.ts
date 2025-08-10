@@ -50,7 +50,7 @@ export default (router: Router): void => {
    *           cozinha: "Brasileira"
    *           descricao_resumida: "Feijoada tradicional brasileira"
    *           descricao_detalhada: "Feijoada é um prato típico brasileiro, feito com feijão preto, carne de porco e acompanhamentos como arroz, farofa e couve."
-   *           imagem: "https://example.com/imagem-feijoada.jpg"
+   *           imagem: "https://media.istockphoto.com/id/899497396/pt/foto/delicious-brazilian-feijoada.jpg?s=2048x2048&w=is&k=20&c=OO_JGRT2AgsybJxSFB-mFP2vsOn7QtsbqEd1sZiUzuw="
    *           valor: 49.90
    */
 

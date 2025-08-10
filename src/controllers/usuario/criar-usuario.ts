@@ -25,8 +25,8 @@ class CriarUsuarioController {
 
       if (!Object.values(Role).includes(role)) {
         return {
-          statusCode: 404,
-          body: { error: `A role ${role} não existem nos papeis de sistema` },
+          statusCode: 400,
+          body: { error: `A role ${role} não existem nos papeis do sistema.` },
         };
       }
 
@@ -54,6 +54,7 @@ class CriarUsuarioController {
         nome,
         email,
         senha: senhaCriptografada,
+        role,
       });
 
       return {

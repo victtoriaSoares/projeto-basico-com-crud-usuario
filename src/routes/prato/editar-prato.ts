@@ -1,15 +1,15 @@
 import { Router } from "express";
-import adaptRoute from "../adapters/express-route-adapter";
-import authMiddleware from "../middlewares/auth-middleware";
-import EditarUsuarioController from "../controllers/usuario/editar-usuario";
+import adaptRoute from "../../adapters/express-route-adapter";
+import authMiddleware from "../../middlewares/auth-middleware";
+import EditarPratoController from "../../controllers/prato/editar-prato";
 
 export default (router: Router): void => {
   /**
    * @swagger
-   * /api/users/{id}:
+   * /api/pratos/{id}:
    *   put:
-   *     summary: Atualiza o usuário por id
-   *     tags: [Users]
+   *     summary: Atualiza o prato por id
+   *     tags: [Pratos]
    *     security:
    *       - bearerAuth: []
    *     parameters:
@@ -18,24 +18,24 @@ export default (router: Router): void => {
    *         schema:
    *           type: integer
    *         required: true
-   *         description: The user id
+   *         description: The prato id
    *     requestBody:
    *       required: true
    *       content:
    *         application/json:
    *           schema:
-   *             $ref: '#/components/schemas/User'
+   *             $ref: '#/components/schemas/Prato'
    *     responses:
    *       200:
-   *         description: O usuário foi atualizado com sucesso
+   *         description: O prato foi atualizado com sucesso
    *       404:
-   *         description: O usuário não foi encontrado
+   *         description: O prato não foi encontrado
    *       500:
    *         description: Algum erro aconteceu
    */
   router.put(
-    "/users/:id",
+    "/pratos/:id",
     authMiddleware,
-    adaptRoute(new EditarUsuarioController())
+    adaptRoute(new EditarPratoController())
   );
 };
